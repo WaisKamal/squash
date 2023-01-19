@@ -1,0 +1,14 @@
+{
+  "boardSizeOptions": [
+    { "width": 5, "height": 5 },
+    { "width": 10, "height": 5 },
+    { "width": 10, "height": 10 },
+    { "width": 15, "height": 10 },
+    { "width": 15, "height": 15 }
+  ],
+  "gameModeOptions": [
+    { "label": "1v1 Online", "value": "dual-online" },
+    { "label": "1v1 Local", "value": "dual-local" },
+    { "label": "Solo", "value": "solo" }
+  ]
+}

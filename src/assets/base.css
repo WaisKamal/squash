@@ -1,0 +1,25 @@
+@font-face {
+  font-family: "Arial Rounded";
+  src: url("../fonts/arial-rounded.ttf")
+}
+
+:root {
+  /* Theme colors */
+  --color-primary: #009688;
+  --color-primary-dark: #00897B;
+
+  /* Component-specific colors */
+  --color-cell-crossed: #c00;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial Rounded";
+  user-select: none;
+}
+
+#app {
+  padding: 50px;
+}
