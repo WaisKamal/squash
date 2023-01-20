@@ -11,8 +11,8 @@ import Dash from "./components/Dash.vue"
 
 let game = reactive({
   boardDimensions: {
-    columns: 15,        // Number of columns
-    height: 15,       // Number of rows
+    rows: 10,
+    columns: 10,
   },
   rowHeaders: [
     [3],
@@ -30,27 +30,34 @@ let game = reactive({
   ],
   boardSizeOptions: config.boardSizeOptions,
   gameModeOptions: config.gameModeOptions,
-  status: "nogame",
-  boardData: undefined // Temporary: board data must be in server
+  boardData: undefined, // Temporary: board data must be in server
+  boardState: {
+    mouseButton: "",
+    selectedCells: [],
+    data: undefined
+  },
+  status: "nogame"
 })
 // Generate board
-let boardConfig = generateBoard(game.boardDimensions.height, game.boardDimensions.columns)
+let boardConfig = generateBoard(game.boardDimensions.rows, game.boardDimensions.columns)
 game.rowHeaders = boardConfig.rowHeaders
 game.columnHeaders = boardConfig.columnHeaders
 // Temporary: board data must be in server
 game.boardData = boardConfig.board
+game.boardState.data = game.boardData.map(row => row.map(cell => 0))
 
 function seekButtonClicked(boardSize) {
   console.log(boardSize)
-  let boardConfig = generateBoard(boardSize.columns, boardSize.height)
-  game.boardDimensions = { columns: boardSize.columns, height: boardSize.height }
+  let boardConfig = generateBoard(boardSize.rows, boardSize.columns)
+  game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
   game.rowHeaders = boardConfig.rowHeaders
   game.columnHeaders = boardConfig.columnHeaders
   // Temporary: board data must be in server
   game.boardData = boardConfig.board
+  game.boardState.data = game.boardData.map(row => row.map(cell => 0))
 }
 
-function generateBoard(rows, columns) {
+function generateBoard2(rows, columns) {
   // The resulting board configuration
   let board = Array(rows)
   let rowHeaders = Array(rows).fill().map(_ => [])
@@ -93,6 +100,57 @@ function generateBoard(rows, columns) {
   }
   return { board, rowHeaders, columnHeaders }
 }
+
+function generateBoard(rows, columns) {
+  // The resulting board configuration
+  let board = Array(rows)
+  let rowHeaders = Array(rows).fill().map(_ => [])
+  let columnHeaders = Array(columns).fill().map(_ => [])
+
+  for (var r = 0; r < rows; r++) {
+    let row = Array(columns)
+    for (var c = 0; c < columns; c++) {
+      row[c] = (Math.random() - 0.4 > 0)
+    }
+    board[r] = row
+  }
+
+  // Generate row headers
+  for (var r = 0; r < rows; r++) {
+    let isFilled = board[r][0]
+    let currentLength = 0
+    for (var c = 0; c < columns; c++) {
+      if (board[r][c] == isFilled) {
+        currentLength++
+      } else {
+        if (isFilled) rowHeaders[r].push(currentLength)
+        currentLength = 1
+        isFilled = !isFilled
+      }
+    }
+    if (isFilled) rowHeaders[r].push(currentLength)
+    if (rowHeaders[r].length == 0) rowHeaders[r] = [0]
+  }
+
+  // Generate column headers
+  for (var c = 0; c < columns; c++) {
+    let isFilled = board[0][c]
+    let currentLength = 0
+    for (var r = 0; r < rows; r++) {
+      if (board[r][c] == isFilled) {
+        currentLength++
+      } else {
+        if (isFilled) columnHeaders[c].push(currentLength)
+        currentLength = 1
+        isFilled = !isFilled
+      }
+    }
+    if (isFilled) columnHeaders[c].push(currentLength)
+    if (columnHeaders[c].length == 0) columnHeaders[c] = [0]
+  }
+
+  return { board, rowHeaders, columnHeaders }
+}
 </script>
 
 <template>
@@ -102,7 +160,8 @@ function generateBoard(rows, columns) {
       :boardData="game.boardData"
       :dimensions="game.boardDimensions" 
       :rowHeaders="game.rowHeaders"
-      :columnHeaders="game.columnHeaders" />
+      :columnHeaders="game.columnHeaders"
+      :state="game.boardState" />
     <Dash
       :boardSizeOptions="game.boardSizeOptions"
       :gameModeOptions="game.gameModeOptions"

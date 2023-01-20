@@ -9,96 +9,86 @@ const data = defineProps({
   dimensions: Object,
   rowHeaders: Array,
   columnHeaders: Array,
-  boardData: Array
-})
-
-// Board state
-const state = reactive({
-  // return {
-    mouseButton: "",   // The clicked mouse button
-    selectedCells: [],
-    // Initialize board cells to zero
-    // 0: not filled, 1: affirmed, 2: crossed
-    data: data.boardData.map(row => row.map(cell => 0))
-  // }
+  boardData: Array,
+  state: Object
 })
 
 // Board grid configuration
 const boardStyle = computed(() => {
   return {
-    "grid-template-columns": `repeat(${data.dimensions.width}, auto)`
+    "grid-template-columns": `repeat(${data.dimensions.columns}, auto)`
   }
 })
 
 function cellPressed(e) {
   if (e.which == 1) {
-    state.mouseButton = "left"
+    data.state.mouseButton = "left"
   } else if (e.which == 3) {
-    state.mouseButton = "right"
+    data.state.mouseButton = "right"
   }
   let row = Number(e.target.getAttribute("data-row"))
   let column = Number(e.target.getAttribute("data-column"))
   // Set selected cells
-  state.selectedCells.push({ row, column })
+  data.state.selectedCells.push({ row, column })
 }
 
 function cellReleased(e) {
   // Apply action first
   // NOTE: does not apply penalties
   let index = 0
-  state.selectedCells.forEach((cell) => {
-    if (state.data[cell.row][cell.column] == 0) {
+  data.state.selectedCells.forEach((cell) => {
+    if (data.state.data[cell.row][cell.column] == 0) {
       setTimeout(() => {
-        state.data[cell.row][cell.column] = data.boardData[cell.row][cell.column] ? 1 : 2
+        data.state.data[cell.row][cell.column] = data.boardData[cell.row][cell.column] ? 1 : 2
       }, index++ * 100)
     }
   })
   // Clear selected cells
-  state.selectedCells = []
+  data.state.selectedCells = []
 }
 
 function cellHovered(e) {
   let row = Number(e.target.getAttribute("data-row"))
   let column = Number(e.target.getAttribute("data-column"))
-  if (state.selectedCells.length > 0) {
-    let startRow = state.selectedCells[0].row
-    let startColumn = state.selectedCells[0].column
+  if (data.state.selectedCells.length > 0) {
+    let startRow = data.state.selectedCells[0].row
+    let startColumn = data.state.selectedCells[0].column
     let vDist = Math.abs(row - startRow)
     let hDist = Math.abs(column - startColumn)
-    state.selectedCells = []
+    data.state.selectedCells = []
     // Populate the selected cells array
     if (vDist > hDist) {
       let direction = row > startRow ? 1 : -1
       for (var i = startRow; i != row + direction; i += direction) {
-        state.selectedCells.push({ row: i, column: startColumn })
+        data.state.selectedCells.push({ row: i, column: startColumn })
       }
     } else {
       let direction = column > startColumn ? 1 : -1
       for (var i = startColumn; i != column + direction; i += direction) {
-        state.selectedCells.push({ row: startRow, column: i })
+        data.state.selectedCells.push({ row: startRow, column: i })
       }
     }
   }
 }
 
 function mouseLeftBoardGrid() {
-  state.selectedCells = []
+  data.state.selectedCells = []
 }
 
 // Utility function that takes array of cells and cell number (starting at 1)
 // and outputs whether the cell exists in the array
 function cellExists(arr, cellOrder) {
-  let row = Math.floor((cellOrder - 1) / data.dimensions.width)
-  let column = (cellOrder - 1) % data.dimensions.width
+  let row = Math.floor((cellOrder - 1) / data.dimensions.columns)
+  let column = (cellOrder - 1) % data.dimensions.columns
   return arr.filter(cell => cell.row == row && cell.column == column).length > 0
 }
 
 // Utility function to decide Cell class based on board state
 function getCellClass(cellOrder) {
-  let row = Math.floor((cellOrder - 1) / data.dimensions.width)
-  let column = (cellOrder - 1) % data.dimensions.width
+  let row = Math.floor((cellOrder - 1) / data.dimensions.columns)
+  let column = (cellOrder - 1) % data.dimensions.columns
   let classes = ["", "affirmed", "crossed"]
-  return classes[state.data[row][column]]
+  return classes[data.state.data[row][column]]
 }
 </script>
 
@@ -111,10 +101,10 @@ function getCellClass(cellOrder) {
       @mouseleave="mouseLeftBoardGrid"
       @contextmenu.prevent="">
       <Cell
-        v-for="i in data.dimensions.width * data.dimensions.height"
-        :class="[cellExists(state.selectedCells, i) ? state.mouseButton == 'left' ? 'marked' : 'unmarked' : '', getCellClass(i)]"
-        :data-row="Math.floor((i - 1) / data.dimensions.width)"
-        :data-column="(i - 1) % data.dimensions.width"
+        v-for="i in data.dimensions.columns * data.dimensions.rows"
+        :class="[cellExists(data.state.selectedCells, i) ? data.state.mouseButton == 'left' ? 'marked' : 'unmarked' : '', getCellClass(i)]"
+        :data-row="Math.floor((i - 1) / data.dimensions.columns)"
+        :data-column="(i - 1) % data.dimensions.columns"
         @mousedown="cellPressed"
         @mouseup="cellReleased"
         @mouseover="cellHovered"

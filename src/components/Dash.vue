@@ -12,8 +12,8 @@ const emit = defineEmits(["seek"])
 
 let seekOptions = reactive({
   boardSize: {
-    width: 5,
-    height: 5
+    columns: 5,
+    rows: 5
   },
   gameMode: "dual-online" // { "solo", "dual-online", "dual-local" }
 })
@@ -23,8 +23,8 @@ function seekButtonClicked() {
 }
 
 // Utility function to select board size
-function selectBoardSize(width, height) {
-  seekOptions.boardSize = { width, height }
+function selectBoardSize(columns, rows) {
+  seekOptions.boardSize = { columns, rows }
 }
 
 // Utiliy function to select game mode
@@ -33,8 +33,8 @@ function selectGameMode(mode) {
 }
 
 // Utility function to check whether a board size option is the selected one
-function isBoardSizeSelected(width, height) {
-  return width == seekOptions.boardSize.width && height == seekOptions.boardSize.height
+function isBoardSizeSelected(columns, rows) {
+  return columns == seekOptions.boardSize.columns && rows == seekOptions.boardSize.rows
 }
 
 // Utility function to check whether a game mode option is the selected one
@@ -49,9 +49,9 @@ function isGameModeSelected(mode) {
     <div class="board-size-options">
       <BoardSizeOption
         v-for="option in props.boardSizeOptions"
-        :class="isBoardSizeSelected(option.width, option.height) ? 'selected' : ''"
-        @click="selectBoardSize(option.width, option.height)">
-        {{ `${option.width}x${option.height}` }}
+        :class="isBoardSizeSelected(option.columns, option.rows) ? 'selected' : ''"
+        @click="selectBoardSize(option.columns, option.rows)">
+        {{ `${option.columns}x${option.rows}` }}
       </BoardSizeOption>
     </div>
     <h3>Game mode</h3>
