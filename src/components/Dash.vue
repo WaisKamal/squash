@@ -1,11 +1,12 @@
 <script setup>
 import { reactive } from "vue"
-import BoardSizeOption from './BoardSizeOption.vue';
-import GameModeOption from './GameModeOption.vue';
+import DashGameStatus from "./dashpages/DashGameStatus.vue";
+import DashSeek from "./dashpages/DashSeek.vue";
 
 const props = defineProps({
   boardSizeOptions: Object,
-  gameModeOptions: Object
+  gameModeOptions: Object,
+  gameStatus: String
 })
 
 const emit = defineEmits(["seek"])
@@ -17,53 +18,30 @@ let seekOptions = reactive({
   },
   gameMode: "dual-online" // { "solo", "dual-online", "dual-local" }
 })
+setTimeout(() => {
+  console.log(seekOptions.boardSize)
+}, 5000)
 
 function seekButtonClicked() {
   emit("seek", seekOptions.boardSize)
 }
 
-// Utility function to select board size
-function selectBoardSize(columns, rows) {
-  seekOptions.boardSize = { columns, rows }
-}
-
-// Utiliy function to select game mode
-function selectGameMode(mode) {
-  seekOptions.gameMode = mode
-}
-
-// Utility function to check whether a board size option is the selected one
-function isBoardSizeSelected(columns, rows) {
-  return columns == seekOptions.boardSize.columns && rows == seekOptions.boardSize.rows
-}
-
-// Utility function to check whether a game mode option is the selected one
-function isGameModeSelected(mode) {
-  return seekOptions.gameMode == mode
+// Utility function to get button text from game status
+function getButtonText() {
+  const statusToText = {
+    "nogame": "Play",
+    "playing": "Quit game",
+    "gameover": "Play again"
+  }
+  return statusToText[props.gameStatus]
 }
 </script>
 
 <template>
   <div class="dash">
-    <h3>Board size</h3>
-    <div class="board-size-options">
-      <BoardSizeOption
-        v-for="option in props.boardSizeOptions"
-        :class="isBoardSizeSelected(option.columns, option.rows) ? 'selected' : ''"
-        @click="selectBoardSize(option.columns, option.rows)">
-        {{ `${option.columns}x${option.rows}` }}
-      </BoardSizeOption>
-    </div>
-    <h3>Game mode</h3>
-    <div class="game-mode-options">
-      <GameModeOption
-        v-for="option in props.gameModeOptions"
-        :class="isGameModeSelected(option.value) ? 'selected' : ''"
-        @click="selectGameMode(option.value)">
-        {{ option.label }}
-      </GameModeOption>
-    </div>
-    <button id="btn-play" @click="seekButtonClicked">Play</button>
+    <DashSeek :seekOptions="seekOptions" v-show="props.gameStatus == 'nogame'"/>
+    <DashGameStatus v-if="props.gameStatus == 'playing'"/>
+    <button id="btn-play" @click="seekButtonClicked">{{ getButtonText() }}</button>
   </div>
 </template>
 
@@ -72,27 +50,11 @@ function isGameModeSelected(mode) {
   position: relative;
 }
 
-.dash h3 {
-  font-family: "Arial Rounded";
-  font-size: 32px;
-  color: var(--color-primary);
-}
-
-.dash h3:not(:first-of-type) {
-  margin-top: 20px
-}
-
-.dash .board-size-options, .game-mode-options {
-  display: flex;
-  max-width: 360px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
 .dash #btn-play {
   width: 100%;
+  min-width: 360px;
   padding: 15px;
-  margin-top: 20px;
+  margin-top: 10px;
   border: none;
   border-radius: 5px;
   outline: none;

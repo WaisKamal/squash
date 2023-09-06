@@ -14,7 +14,7 @@
   border: 3px solid transparent;
   border-radius: 10px;
   margin-right: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   cursor: pointer;
 }
 

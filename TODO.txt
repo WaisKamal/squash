@@ -1,0 +1,4 @@
+Revisit dashboard to allow for:
+  - A seek game page
+  - A game running page with a timer
+  - A game won/lost page

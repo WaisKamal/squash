@@ -10,7 +10,8 @@ const data = defineProps({
   rowHeaders: Array,
   columnHeaders: Array,
   boardData: Array,
-  state: Object
+  state: Object,
+  gameStatus: String
 })
 
 // Board grid configuration
@@ -93,7 +94,7 @@ function getCellClass(cellOrder) {
 </script>
 
 <template>
-  <div class="board">
+  <div class="board" v-show="data.gameStatus != 'nogame'">
     <div />
     <ColumnHeaders :headers="data.columnHeaders" />
     <RowHeaders :headers="data.rowHeaders" />
@@ -119,11 +120,7 @@ function getCellClass(cellOrder) {
   grid-template-rows: min-content min-content;
   grid-template-columns: min-content min-content;
   grid-gap: 1px;
-  padding: 20px;
-  border: 1px solid var(--color-primary);
   border-radius: 50px 0px 0px 0px;
-  /* box-shadow: 0px 0px 50px 0px var(--color-primary); */
-  /* background: #F9F9F9; */
 }
 
 .board .grid {
