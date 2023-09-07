@@ -1,17 +1,24 @@
 <script setup>
-import { reactive, computed } from "vue";
+import { computed, toRaw } from "vue";
 import RowHeaders from "./RowHeaders.vue";
 import ColumnHeaders from "./ColumnHeaders.vue";
 import Cell from "./Cell.vue"
 
+const emit = defineEmits(["cellMarked"])
+
 // Board data
 const data = defineProps({
-  dimensions: Object,
-  rowHeaders: Array,
-  columnHeaders: Array,
-  boardData: Array,
-  state: Object,
-  gameStatus: String
+  dimensions: Object,   // Board dimensions - { rows, columns }
+  rowHeaders: Array,    // Row headers
+  columnHeaders: Array, // Column headers
+  boardData: Array,     // 2D array (true = cell to be affirmed, false = cell to be crossed)
+  state: Object,        // {
+                        //   data: 2D array (0 = empty, 1 = affirmed, 2 = crossed)
+                        //   mouseButton: the mouse button currently clicked ("left", "right", or "")
+                        //   selectedCells: array of elements { row, column }
+                        // }
+  cellsMarked: Number,  // Number of cells that have been marked
+  gameStatus: String    // "nogame", "seek", "playing", "gameover"
 })
 
 // Board grid configuration
@@ -22,11 +29,13 @@ const boardStyle = computed(() => {
 })
 
 function cellPressed(e) {
+  // Assign mouseButton
   if (e.which == 1) {
     data.state.mouseButton = "left"
   } else if (e.which == 3) {
     data.state.mouseButton = "right"
   }
+  // Coordinates of selected cell
   let row = Number(e.target.getAttribute("data-row"))
   let column = Number(e.target.getAttribute("data-column"))
   // Set selected cells
@@ -39,6 +48,8 @@ function cellReleased(e) {
   let index = 0
   data.state.selectedCells.forEach((cell) => {
     if (data.state.data[cell.row][cell.column] == 0) {
+      // Notify App.vue that a cell has been marked
+      emit("cellMarked")
       setTimeout(() => {
         data.state.data[cell.row][cell.column] = data.boardData[cell.row][cell.column] ? 1 : 2
       }, index++ * 100)
@@ -76,8 +87,9 @@ function mouseLeftBoardGrid() {
   data.state.selectedCells = []
 }
 
-// Utility function that takes array of cells and cell number (starting at 1)
-// and outputs whether the cell exists in the array
+// Utility function that takes array of cells { row, column } and cell number
+// (starting at 1 and going left-to-right) and outputs whether the cell exists
+// in the array
 function cellExists(arr, cellOrder) {
   let row = Math.floor((cellOrder - 1) / data.dimensions.columns)
   let column = (cellOrder - 1) % data.dimensions.columns
@@ -95,7 +107,7 @@ function getCellClass(cellOrder) {
 
 <template>
   <div class="board" v-show="data.gameStatus != 'nogame'">
-    <div />
+    <div></div>
     <ColumnHeaders :headers="data.columnHeaders" />
     <RowHeaders :headers="data.rowHeaders" />
     <div class="grid" :style="boardStyle"

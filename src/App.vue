@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from "vue"
+import { reactive, computed } from "vue"
 
 // App configuration
 import config from "./config.json"
@@ -7,7 +7,7 @@ import config from "./config.json"
 // Components
 import Title from "./components/Title.vue"
 import Board from "./components/Board.vue"
-import Dash from "./components/Dash.vue"
+import Dash from "./components/dashpages/Dash.vue"
 import SeekTable from "./components/SeekTable.vue"
 
 // Utility functions
@@ -51,10 +51,22 @@ let game = reactive({
   boardState: {
     mouseButton: "",
     selectedCells: [],
-    data: undefined
+    data: undefined,
+    cellsMarked: 0,
   },
-  status: "nogame" // "nogame", "playing", "gameover"
+  status: "nogame" // "nogame", "seek", "playing", "gameover"
 })
+
+let playerData = computed(() => {
+  return {
+    playerName: "Player",
+    playerProgress: 100 * game.boardState.cellsMarked /
+                    (game.boardDimensions.rows * game.boardDimensions.columns),
+    opponentName: "Opponent",
+    opponentProgress: 0
+  }
+})
+
 // Generate board
 let boardConfig = utils.generateBoard(game.boardDimensions.rows, game.boardDimensions.columns)
 game.rowHeaders = boardConfig.rowHeaders
@@ -63,16 +75,23 @@ game.columnHeaders = boardConfig.columnHeaders
 game.boardData = boardConfig.board
 game.boardState.data = game.boardData.map(row => row.map(cell => 0))
 
-function seekButtonClicked(boardSize) {
-  console.log(boardSize)
-  let boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
-  game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
-  game.rowHeaders = boardConfig.rowHeaders
-  game.columnHeaders = boardConfig.columnHeaders
-  // Temporary: board data must be in server
-  game.boardData = boardConfig.board
-  game.boardState.data = game.boardData.map(row => row.map(cell => 0))
-  game.status = "playing"
+function cellMarked() {
+  game.boardState.cellsMarked++
+}
+
+function dashButtonClicked(boardSize) {
+  if (game.status == "playing") {
+    game.status = "nogame"
+  } else {
+    let boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
+    game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
+    game.rowHeaders = boardConfig.rowHeaders
+    game.columnHeaders = boardConfig.columnHeaders
+    // Temporary: board data must be in server
+    game.boardData = boardConfig.board
+    game.boardState.data = game.boardData.map(row => row.map(cell => 0))
+    game.status = "playing"
+  }
 }
 </script>
 
@@ -85,12 +104,14 @@ function seekButtonClicked(boardSize) {
       :rowHeaders="game.rowHeaders"
       :columnHeaders="game.columnHeaders"
       :state="game.boardState"
-      :gameStatus="game.status" />
+      :gameStatus="game.status"
+      @cellMarked="cellMarked" />
     <Dash
       :boardSizeOptions="game.boardSizeOptions"
       :gameModeOptions="game.gameModeOptions"
       :gameStatus="game.status"
-      @seek="seekButtonClicked" />
+      :playerData="playerData"
+      @dashButtonClicked="dashButtonClicked" />
     <SeekTable :gameStatus="game.status" :seekRequests="seekRequests" />
   </div>
 </template>

@@ -1,15 +1,16 @@
 <script setup>
 import { reactive } from "vue"
-import DashGameStatus from "./dashpages/DashGameStatus.vue";
-import DashSeek from "./dashpages/DashSeek.vue";
+import DashGameStatus from "./GameDash/DashGameStatus.vue";
+import DashSeek from "./StartDash/DashSeek.vue";
 
 const props = defineProps({
   boardSizeOptions: Object,
   gameModeOptions: Object,
-  gameStatus: String
+  gameStatus: String,
+  playerData: Object
 })
 
-const emit = defineEmits(["seek"])
+const emit = defineEmits(["dashButtonClicked"])
 
 let seekOptions = reactive({
   boardSize: {
@@ -23,7 +24,7 @@ setTimeout(() => {
 }, 5000)
 
 function seekButtonClicked() {
-  emit("seek", seekOptions.boardSize)
+  emit("dashButtonClicked", seekOptions.boardSize)
 }
 
 // Utility function to get button text from game status
@@ -40,7 +41,12 @@ function getButtonText() {
 <template>
   <div class="dash">
     <DashSeek :seekOptions="seekOptions" v-show="props.gameStatus == 'nogame'"/>
-    <DashGameStatus v-if="props.gameStatus == 'playing'"/>
+    <DashGameStatus
+      :playerName="props.playerData.playerName"
+      :playerProgress="props.playerData.playerProgress"
+      :opponentName="props.playerData.opponentName"
+      :opponentProgress="props.playerData.opponentProgress"
+      v-if="props.gameStatus == 'playing'" />
     <button id="btn-play" @click="seekButtonClicked">{{ getButtonText() }}</button>
   </div>
 </template>

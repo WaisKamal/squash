@@ -1,8 +1,8 @@
 <script setup>
-import config from '../../config.json'
+import config from '../../../config.json'
 
-import BoardSizeOption from '../BoardSizeOption.vue';
-import GameModeOption from '../GameModeOption.vue';
+import BoardSizeOption from '../../BoardSizeOption.vue';
+import GameModeOption from '../../GameModeOption.vue';
 
 const props = defineProps({
   seekOptions: Object
