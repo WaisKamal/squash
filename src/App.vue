@@ -15,15 +15,15 @@ import utils from "./utils/utils"
 
 // Active seek requests
 let seekRequests = reactive([
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Wais", boardSize: { width: 10, height: 10 }, rating: 2000 }
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
+  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 }
 ])
 
 let game = reactive({
@@ -76,6 +76,7 @@ game.boardData = boardConfig.board
 game.boardState.data = game.boardData.map(row => row.map(cell => 0))
 
 function cellMarked() {
+  console.log(game.boardState.cellsMarked)
   game.boardState.cellsMarked++
 }
 

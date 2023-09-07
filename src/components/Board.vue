@@ -49,9 +49,9 @@ function cellReleased(e) {
   data.state.selectedCells.forEach((cell) => {
     if (data.state.data[cell.row][cell.column] == 0) {
       // Notify App.vue that a cell has been marked
-      emit("cellMarked")
       setTimeout(() => {
         data.state.data[cell.row][cell.column] = data.boardData[cell.row][cell.column] ? 1 : 2
+        emit("cellMarked")
       }, index++ * 100)
     }
   })
