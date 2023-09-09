@@ -52,6 +52,7 @@ let game = reactive({
     mouseButton: "",
     selectedCells: [],
     data: undefined,
+    styleData: undefined,
     cellsMarked: 0,
   },
   status: "nogame" // "nogame", "seek", "playing", "gameover"
@@ -74,11 +75,7 @@ game.columnHeaders = boardConfig.columnHeaders
 // Temporary: board data must be in server
 game.boardData = boardConfig.board
 game.boardState.data = game.boardData.map(row => row.map(cell => 0))
-
-function cellMarked() {
-  console.log(game.boardState.cellsMarked)
-  game.boardState.cellsMarked++
-}
+game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
 
 function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
@@ -91,7 +88,67 @@ function dashButtonClicked(boardSize) {
     // Temporary: board data must be in server
     game.boardData = boardConfig.board
     game.boardState.data = game.boardData.map(row => row.map(cell => 0))
+    game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
+    game.boardState.cellsMarked = 0
     game.status = "playing"
+  }
+}
+
+function cellPressed(e) {
+  // Assign mouseButton
+  if (e.which == 1) {
+    game.boardState.mouseButton = "left"
+  } else if (e.which == 3) {
+    game.boardState.mouseButton = "right"
+  }
+  // Coordinates of selected cell
+  let row = Number(e.target.getAttribute("data-row"))
+  let column = Number(e.target.getAttribute("data-column"))
+  // Set selected cells
+  game.boardState.selectedCells.push({ row, column })
+}
+
+function cellReleased() {
+  // Apply action first
+  // NOTE: does not apply penalties
+  let index = 0
+  game.boardState.selectedCells.forEach(cell => {
+    if (game.boardState.data[cell.row][cell.column] == 0) {
+      // First modify boardState.data
+      game.boardState.data[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2
+      game.boardState.cellsMarked++
+      console.log(game.boardState.cellsMarked)
+      // Then modify boardState.styleData
+      setTimeout(() => {
+        game.boardState.styleData[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2
+      }, index++ * 100)
+    }
+  })
+  // Clear selected cells
+  game.boardState.selectedCells = []
+}
+
+function cellHovered(e) {
+  let row = Number(e.target.getAttribute("data-row"))
+  let column = Number(e.target.getAttribute("data-column"))
+  if (game.boardState.selectedCells.length > 0) {
+    let startRow = game.boardState.selectedCells[0].row
+    let startColumn = game.boardState.selectedCells[0].column
+    let vDist = Math.abs(row - startRow)
+    let hDist = Math.abs(column - startColumn)
+    game.boardState.selectedCells = []
+    // Populate the selected cells array
+    if (vDist > hDist) {
+      let direction = row > startRow ? 1 : -1
+      for (var i = startRow; i != row + direction; i += direction) {
+        game.boardState.selectedCells.push({ row: i, column: startColumn })
+      }
+    } else {
+      let direction = column > startColumn ? 1 : -1
+      for (var i = startColumn; i != column + direction; i += direction) {
+        game.boardState.selectedCells.push({ row: startRow, column: i })
+      }
+    }
   }
 }
 </script>
@@ -106,7 +163,9 @@ function dashButtonClicked(boardSize) {
       :columnHeaders="game.columnHeaders"
       :state="game.boardState"
       :gameStatus="game.status"
-      @cellMarked="cellMarked" />
+      @cellPressed="cellPressed"
+      @cellReleased="cellReleased"
+      @cellHovered="cellHovered" />
     <Dash
       :boardSizeOptions="game.boardSizeOptions"
       :gameModeOptions="game.gameModeOptions"

@@ -4,7 +4,7 @@ import RowHeaders from "./RowHeaders.vue";
 import ColumnHeaders from "./ColumnHeaders.vue";
 import Cell from "./Cell.vue"
 
-const emit = defineEmits(["cellMarked"])
+const emit = defineEmits(["cellPressed", "cellReleased", "cellHovered"])
 
 // Board data
 const data = defineProps({
@@ -13,9 +13,10 @@ const data = defineProps({
   columnHeaders: Array, // Column headers
   boardData: Array,     // 2D array (true = cell to be affirmed, false = cell to be crossed)
   state: Object,        // {
-                        //   data: 2D array (0 = empty, 1 = affirmed, 2 = crossed)
+                        //   data: 2D array of cells (0 = empty, 1 = affirmed, 2 = crossed)
+                        //   styleData: same as data, just gets assigned in a setTimeout call
                         //   mouseButton: the mouse button currently clicked ("left", "right", or "")
-                        //   selectedCells: array of elements { row, column }
+                        //   selectedCells: array of selected cells in format { row, column }
                         // }
   cellsMarked: Number,  // Number of cells that have been marked
   gameStatus: String    // "nogame", "seek", "playing", "gameover"
@@ -28,63 +29,20 @@ const boardStyle = computed(() => {
   }
 })
 
-function cellPressed(e) {
-  // Assign mouseButton
-  if (e.which == 1) {
-    data.state.mouseButton = "left"
-  } else if (e.which == 3) {
-    data.state.mouseButton = "right"
-  }
-  // Coordinates of selected cell
-  let row = Number(e.target.getAttribute("data-row"))
-  let column = Number(e.target.getAttribute("data-column"))
-  // Set selected cells
-  data.state.selectedCells.push({ row, column })
+function mouseLeftBoardGrid() {
+  data.state.selectedCells = []
 }
 
-function cellReleased(e) {
-  // Apply action first
-  // NOTE: does not apply penalties
-  let index = 0
-  data.state.selectedCells.forEach((cell) => {
-    if (data.state.data[cell.row][cell.column] == 0) {
-      // Notify App.vue that a cell has been marked
-      setTimeout(() => {
-        data.state.data[cell.row][cell.column] = data.boardData[cell.row][cell.column] ? 1 : 2
-        emit("cellMarked")
-      }, index++ * 100)
-    }
-  })
-  // Clear selected cells
-  data.state.selectedCells = []
+function cellPressed(e) {
+  emit("cellPressed", e)
+}
+
+function cellReleased() {
+  emit("cellReleased")
 }
 
 function cellHovered(e) {
-  let row = Number(e.target.getAttribute("data-row"))
-  let column = Number(e.target.getAttribute("data-column"))
-  if (data.state.selectedCells.length > 0) {
-    let startRow = data.state.selectedCells[0].row
-    let startColumn = data.state.selectedCells[0].column
-    let vDist = Math.abs(row - startRow)
-    let hDist = Math.abs(column - startColumn)
-    data.state.selectedCells = []
-    // Populate the selected cells array
-    if (vDist > hDist) {
-      let direction = row > startRow ? 1 : -1
-      for (var i = startRow; i != row + direction; i += direction) {
-        data.state.selectedCells.push({ row: i, column: startColumn })
-      }
-    } else {
-      let direction = column > startColumn ? 1 : -1
-      for (var i = startColumn; i != column + direction; i += direction) {
-        data.state.selectedCells.push({ row: startRow, column: i })
-      }
-    }
-  }
-}
-
-function mouseLeftBoardGrid() {
-  data.state.selectedCells = []
+  emit("cellHovered", e)
 }
 
 // Utility function that takes array of cells { row, column } and cell number
@@ -101,7 +59,7 @@ function getCellClass(cellOrder) {
   let row = Math.floor((cellOrder - 1) / data.dimensions.columns)
   let column = (cellOrder - 1) % data.dimensions.columns
   let classes = ["", "affirmed", "crossed"]
-  return classes[data.state.data[row][column]]
+  return classes[data.state.styleData[row][column]]
 }
 </script>
 
