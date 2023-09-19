@@ -1,8 +1,5 @@
-<script setup>
-</script>
-
 <template>
-  <h1 classs="title">Squash</h1>
+  <h1 classs="title">Squash!</h1>
 </template>
 
 <style scoped>
