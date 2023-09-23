@@ -1,42 +1,72 @@
 <script setup>
+let props = defineProps({
+  cellNumber: Number,    // The order of the cell in the currently selected cells
+  cellState: Array      // One of "marked", "unmarked", "affirmed", "crossed", ""
+})
 </script>
 
 <template>
-  <div class="cell"></div>
+  <div class="cell" :class="props.cellState">
+    <img :class="cellState.includes('affirmed') ? 'shown' : ''" src="@/assets/img/affirmed.png" />
+    <img :class="cellState.includes('crossed') ? 'shown' : ''" src="@/assets/img/crossed.png" />
+    <span>{{ props.cellNumber > 0 ? cellNumber : '' }}</span>
+  </div>
 </template>
 
 <style scoped>
 .cell {
+  display: flex;
   width: 30px;
   height: 30px;
-  background: #F0F0F0;
+  justify-content: center;
+  align-items: center;
+  background: #FFF center no-repeat;
+}
+
+.cell * {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.cell img {
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.cell img.shown {
+  opacity: 1;
 }
 
 .cell:hover {
   border: 1px solid #DDD;
 }
 
+.cell.crossed {
+  border: none;
+  /* box-shadow: 0px 0px 3px 2px var(--color-cell-crossed) inset; */
+  transition: 0.2s;
+  /* background: var(--color-cell-crossed); */
+  /* background: var(--icon-crossed) center no-repeat; */
+}
+
+.cell.affirmed {
+  border: none;
+  /* box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.25) inset; */
+  transition: 0.2s;
+  /* background: var(--color-primary); */
+  /* background: var(--icon-affirmed) center no-repeat; */
+}
+
 .cell.marked {
   border: none;
   box-shadow: 0px 0px 3px 2px var(--color-primary) inset;
+  transition: none;
 }
 
 .cell.unmarked {
   border: none;
   box-shadow: 0px 0px 3px 2px var(--color-cell-crossed) inset;
-}
-
-.cell.crossed {
-  border: none;
-  box-shadow: 0px 0px 3px 2px var(--color-cell-crossed) inset;
-  transition: 0.2s;
-  background: var(--color-cell-crossed);
-}
-
-.cell.affirmed {
-  border: none;
-  box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.25) inset;
-  transition: 0.2s;
-  background: var(--color-primary);
+  transition: none;
 }
 </style>

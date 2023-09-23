@@ -45,9 +45,9 @@ function isGameModeSelected(mode) {
       <GameModeOption
         v-for="option in config.gameModeOptions"
         :class="isGameModeSelected(option.value) ? 'selected' : ''"
-        @click="selectGameMode(option.value)">
-        {{ option.label }}
-      </GameModeOption>
+        :label="option.label"
+        :iconName="option.value"
+        @click="selectGameMode(option.value)" />
     </div>
   </div>
 </template>

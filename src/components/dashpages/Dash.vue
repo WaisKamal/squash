@@ -14,14 +14,11 @@ const emit = defineEmits(["dashButtonClicked"])
 
 let seekOptions = reactive({
   boardSize: {
-    columns: 5,
-    rows: 5
+    columns: 10,
+    rows: 10
   },
-  gameMode: "dual-online" // { "solo", "dual-online", "dual-local" }
+  gameMode: "1v1-online" // { "solo", "1v1-online", "1v1-local" }
 })
-setTimeout(() => {
-  console.log(seekOptions.boardSize)
-}, 5000)
 
 function seekButtonClicked() {
   emit("dashButtonClicked", seekOptions.boardSize)

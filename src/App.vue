@@ -117,7 +117,6 @@ function cellReleased() {
       // First modify boardState.data
       game.boardState.data[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2
       game.boardState.cellsMarked++
-      console.log(game.boardState.cellsMarked)
       // Then modify boardState.styleData
       setTimeout(() => {
         game.boardState.styleData[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2

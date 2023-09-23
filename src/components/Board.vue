@@ -54,28 +54,44 @@ function cellExists(arr, cellOrder) {
   return arr.filter(cell => cell.row == row && cell.column == column).length > 0
 }
 
-// Utility function to decide Cell class based on board state
-function getCellClass(cellOrder) {
+
+// Utility function to get cell row and column
+function getCellRowAndColumn(cellOrder) {
   let row = Math.floor((cellOrder - 1) / data.dimensions.columns)
   let column = (cellOrder - 1) % data.dimensions.columns
+  return { row, column }
+}
+
+// Utility function to decide Cell class based on board state
+function getCellClass(cellOrder) {
+  let { row, column } = getCellRowAndColumn(cellOrder)
   let classes = ["", "affirmed", "crossed"]
   return classes[data.state.styleData[row][column]]
+}
+
+// Utility function to extract cell order (starting at 1) in selected cells
+function getCellNumber(cellOrder) {
+  let { row, column } = getCellRowAndColumn(cellOrder)
+  return data.state.selectedCells.findIndex(cell => {
+    return cell.row == row && cell.column == column 
+  }) + 1
 }
 </script>
 
 <template>
   <div class="board" v-show="data.gameStatus != 'nogame'">
     <div></div>
-    <ColumnHeaders :headers="data.columnHeaders" />
+    <ColumnHeaders :headers="columnHeaders" />
     <RowHeaders :headers="data.rowHeaders" />
     <div class="grid" :style="boardStyle"
       @mouseleave="mouseLeftBoardGrid"
       @contextmenu.prevent="">
       <Cell
         v-for="i in data.dimensions.columns * data.dimensions.rows"
-        :class="[cellExists(data.state.selectedCells, i) ? data.state.mouseButton == 'left' ? 'marked' : 'unmarked' : '', getCellClass(i)]"
         :data-row="Math.floor((i - 1) / data.dimensions.columns)"
         :data-column="(i - 1) % data.dimensions.columns"
+        :cellNumber="getCellNumber(i)"
+        :cellState="[cellExists(data.state.selectedCells, i) ? data.state.mouseButton == 'left' ? 'marked' : 'unmarked' : '', getCellClass(i)]"
         @mousedown="cellPressed"
         @mouseup="cellReleased"
         @mouseover="cellHovered"

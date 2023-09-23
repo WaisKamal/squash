@@ -7,8 +7,8 @@
     { "columns": 15, "rows": 15 }
   ],
   "gameModeOptions": [
-    { "label": "1v1 Online", "value": "dual-online" },
-    { "label": "1v1 Local", "value": "dual-local" },
+    { "label": "1v1 Online", "value": "1v1-online" },
+    { "label": "1v1 Local", "value": "1v1-local" },
     { "label": "Solo", "value": "solo" }
   ]
 }

@@ -1,10 +1,16 @@
 <script setup>
+let props = defineProps({
+  iconName: String,
+  label: String
+})
 </script>
 
 <template>
   <div class="option">
-    <div class="icon"></div>
-    <p class="label"><slot/></p>
+    <div class="icon">
+      <img :src="`/src/assets/img/${iconName}.png`" />
+    </div>
+    <p class="label">{{ label }}</p>
   </div>
 </template>
 
@@ -25,9 +31,17 @@
 }
 
 .option .icon {
+  position: relative;
+  display: flex;
   width: 100%;
   height: 30px;
-  background: #DDD; 
+  justify-content: center;
+  align-items: center;
+}
+
+.option .icon img {
+  display: block;
+  height: 100%;
 }
 
 .option p {

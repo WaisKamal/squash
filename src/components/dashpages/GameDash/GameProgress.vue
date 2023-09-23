@@ -3,13 +3,13 @@ let props = defineProps({
   player: String,
   progress: Number
 })
-console.log(props.progress)
 </script>
 
 <template>
   <div class="progress">
     <p>{{ props.player }}</p>
     <div class="progress-bar">
+      <div class="fluid" :style="{ width: props.progress + '%' }"></div>
       <div class="handle" :style="{ left: props.progress + '%' }"></div>
     </div>
   </div>
@@ -30,6 +30,13 @@ console.log(props.progress)
   height: 10px;
   margin-bottom: 30px;
   background: #DDD;
+}
+
+.progress .progress-bar .fluid {
+  position: absolute;
+  height: 100%;
+  transition: 0.25s;
+  background: var(--color-primary);
 }
 
 .progress .progress-bar .handle {
