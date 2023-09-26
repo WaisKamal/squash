@@ -12,7 +12,7 @@ Squash is a multiplayer board game where players solve a numbers riddle by utili
 
 ## Run locally
 
-**This game is under development.** To test the game on your local machine:
+**This game is under development.** Follow these steps to test the game in your local machine:
   1. Install the required depndencies
 
          npm install
