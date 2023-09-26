@@ -3,6 +3,8 @@ function generateBoard2(rows, columns) {
   let board = Array(rows)
   let rowHeaders = Array(rows).fill().map(_ => [])
   let columnHeaders = Array(columns).fill().map(_ => [])
+  let filledCellsCount = 0
+  let emptyCellsCount = 0
   // Generate board and row headers
   for (var i = 0; i < rows; i++) {
     let row = Array(columns)
@@ -14,6 +16,8 @@ function generateBoard2(rows, columns) {
       let connectedCells = Math.ceil(Math.random() * (columns - index))
       for (var _ = 0; _ < connectedCells; _++) {
         row[index++] = fill
+        filledCellsCount += fill
+        emptyCellsCount += !fill
       }
       if (fill) {
         rowHeaders[i].push(connectedCells)
@@ -39,7 +43,7 @@ function generateBoard2(rows, columns) {
     if (isFilled) columnHeaders[c].push(currentLength)
     if (columnHeaders[c].length == 0) columnHeaders[c] = [0]
   }
-  return { board, rowHeaders, columnHeaders }
+  return { board, rowHeaders, columnHeaders, filledCellsCount, emptyCellsCount }
 }
 
 function generateBoard(rows, columns) {
@@ -47,11 +51,15 @@ function generateBoard(rows, columns) {
   let board = Array(rows)
   let rowHeaders = Array(rows).fill().map(_ => [])
   let columnHeaders = Array(columns).fill().map(_ => [])
+  let filledCellsCount = 0
+  let emptyCellsCount = 0
 
   for (var r = 0; r < rows; r++) {
     let row = Array(columns)
     for (var c = 0; c < columns; c++) {
       row[c] = (Math.random() - 0.4 > 0)
+      filledCellsCount += row[c]
+      emptyCellsCount += !row[c]
     }
     board[r] = row
   }
@@ -90,7 +98,7 @@ function generateBoard(rows, columns) {
     if (columnHeaders[c].length == 0) columnHeaders[c] = [0]
   }
 
-  return { board, rowHeaders, columnHeaders }
+  return { board, rowHeaders, columnHeaders, filledCellsCount, emptyCellsCount }
 }
 
 export default { generateBoard, generateBoard2 }

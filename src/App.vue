@@ -45,6 +45,8 @@ let game = reactive({
     [2, 2],
     [3]
   ],
+  filledCellsCount: 0,
+  emptyCellsCount: 0,
   boardSizeOptions: config.boardSizeOptions,
   gameModeOptions: config.gameModeOptions,
   boardData: undefined, // Temporary: board data must be in server
@@ -53,7 +55,8 @@ let game = reactive({
     selectedCells: [],
     data: undefined,
     styleData: undefined,
-    cellsMarked: 0,
+    cellsAffirmed: 0,
+    cellsCrossed: 0
   },
   status: "nogame" // "nogame", "seek", "playing", "gameover"
 })
@@ -61,10 +64,27 @@ let game = reactive({
 let playerData = computed(() => {
   return {
     playerName: "Player",
-    playerProgress: 100 * game.boardState.cellsMarked /
-                    (game.boardDimensions.rows * game.boardDimensions.columns),
+    playerProgress: {
+      filledCells: {
+        marked: game.boardState.cellsAffirmed,
+        total: game.filledCellsCount
+      },
+      emptyCells: {
+        marked: game.boardState.cellsCrossed,
+        total: game.emptyCellsCount
+      }
+    },
     opponentName: "Opponent",
-    opponentProgress: 0
+    opponentProgress: {
+      filledCells: {
+        marked: 0,
+        total: 0
+      },
+      emptyCells: {
+        marked: 0,
+        total: 0
+      }
+    },
   }
 })
 
@@ -72,6 +92,8 @@ let playerData = computed(() => {
 let boardConfig = utils.generateBoard(game.boardDimensions.rows, game.boardDimensions.columns)
 game.rowHeaders = boardConfig.rowHeaders
 game.columnHeaders = boardConfig.columnHeaders
+game.filledCellsCount = boardConfig.filledCellsCount
+game.emptyCellsCount = boardConfig.emptyCellsCount
 // Temporary: board data must be in server
 game.boardData = boardConfig.board
 game.boardState.data = game.boardData.map(row => row.map(cell => 0))
@@ -85,6 +107,8 @@ function dashButtonClicked(boardSize) {
     game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
     game.rowHeaders = boardConfig.rowHeaders
     game.columnHeaders = boardConfig.columnHeaders
+    game.filledCellsCount = boardConfig.filledCellsCount
+    game.emptyCellsCount = boardConfig.emptyCellsCount
     // Temporary: board data must be in server
     game.boardData = boardConfig.board
     game.boardState.data = game.boardData.map(row => row.map(cell => 0))
@@ -115,8 +139,13 @@ function cellReleased() {
   game.boardState.selectedCells.forEach(cell => {
     if (game.boardState.data[cell.row][cell.column] == 0) {
       // First modify boardState.data
-      game.boardState.data[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2
-      game.boardState.cellsMarked++
+      if (game.boardData[cell.row][cell.column]) {
+        game.boardState.data[cell.row][cell.column] = 1
+        game.boardState.cellsAffirmed++
+      } else {
+        game.boardState.data[cell.row][cell.column] = 2
+        game.boardState.cellsCrossed++
+      }
       // Then modify boardState.styleData
       setTimeout(() => {
         game.boardState.styleData[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2

@@ -10,6 +10,8 @@
 
   /* Component-specific colors */
   --color-cell-crossed: #F44336;
+  --color-filled-cells-progress-bar: #B2DFDB;
+  --color-empty-cells-progress-bar: #FFCDD2;
 }
 
 * {

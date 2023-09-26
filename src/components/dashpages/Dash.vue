@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from "vue"
+import { reactive, toRaw } from "vue"
 import DashGameStatus from "./GameDash/DashGameStatus.vue";
 import DashSeek from "./StartDash/DashSeek.vue";
 

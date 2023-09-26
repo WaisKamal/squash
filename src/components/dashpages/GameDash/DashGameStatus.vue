@@ -4,10 +4,13 @@ import GameProgress from './GameProgress.vue';
 import Clock from './Clock.vue'
 
 let props = defineProps({
-  playerName: String,
-  playerProgress: Number,
-  opponentName: String,
-  opponentProgress: Number
+  playerName: String,         // The player's name
+  playerProgress: Object,     // {
+                              //   filledCells: the percentage of filled cells marked
+                              //   emptyCells: the percentage of empty cells marked
+                              // }
+  opponentName: String,       // Similar to playerName
+  opponentProgress: Object    // Similar to opponentProgress
 })
 
 let time = reactive({
@@ -21,8 +24,8 @@ setInterval(() => {
 <template>
   <div class="game-status">
     <Clock :time="time.value" />
-    <GameProgress :player="props.playerName" :progress="props.playerProgress"/>
-    <GameProgress :player="props.opponentName" :progress="props.opponentProgress"/>
+    <GameProgress :playerName="props.playerName" :progress="props.playerProgress"/>
+    <GameProgress :playerName="props.opponentName" :progress="props.opponentProgress"/>
   </div>
 </template>
 
