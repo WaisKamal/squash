@@ -113,7 +113,7 @@ function dashButtonClicked(boardSize) {
     game.boardData = boardConfig.board
     game.boardState.data = game.boardData.map(row => row.map(cell => 0))
     game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
-    game.boardState.cellsMarked = 0
+    game.boardState.cellsAffirmed = game.boardState.cellsCrossed = 0
     game.status = "playing"
   }
 }
