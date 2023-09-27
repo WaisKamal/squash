@@ -9,7 +9,7 @@ let props = defineProps({
   <div class="cell" :class="props.cellState">
     <img :class="cellState.includes('affirmed') ? 'shown' : ''" src="@/assets/img/affirmed.png" />
     <img :class="cellState.includes('crossed') ? 'shown' : ''" src="@/assets/img/crossed.png" />
-    <span>{{ props.cellNumber > 0 ? cellNumber : '' }}</span>
+    <span v-show="props.cellNumber > 0" >{{ props.cellNumber > 0 ? cellNumber : '' }}</span>
   </div>
 </template>
 
@@ -36,6 +36,17 @@ let props = defineProps({
 
 .cell img.shown {
   opacity: 1;
+}
+
+.cell span {
+  width: 20px;
+  height: 20px;
+  padding: 2px 0px;
+  border-radius: 10px;
+  line-height: 1;
+  text-align: center;
+  color: #FFF;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .cell:hover {
