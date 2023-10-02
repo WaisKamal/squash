@@ -1,4 +1,6 @@
 <script setup>
+import { toRaw } from "vue"
+
 let props = defineProps({
   gameStatus: String,
   seekRequests: Array
@@ -14,8 +16,8 @@ let props = defineProps({
           <th>Board Size</th>
         </tr>
         <tr v-for="request in props.seekRequests">
-          <td>{{ request.player }} ({{ request.rating }})</td>
-          <td>{{ request.boardSize.width }}x{{ request.boardSize.height }}</td>
+          <td>{{ request.playerName }} ({{ request.rating }})</td>
+          <td>{{ request.boardDimensions.columns }}x{{ request.boardDimensions.rows }}</td>
         </tr>
       </thead>
     </table>
@@ -25,6 +27,7 @@ let props = defineProps({
 <style scoped>
 .seek-table {
   height: 100%;
+  color: var(--text-color);
 }
 
 .seek-table table {
@@ -33,19 +36,15 @@ let props = defineProps({
 }
 
 .seek-table tr {
-  border-bottom: 1px solid #DDD;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .seek-table tr:not(:first-child):hover {
-  background: #F9F9F9;
+  background: var(--border-color);
 }
 
 .seek-table td, .seek-table th {
   padding: 6px 10px;
   text-align: left;
-}
-
-.seek-table table tr:first-child {
-  
 }
 </style>

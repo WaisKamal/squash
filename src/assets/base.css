@@ -6,12 +6,37 @@
 :root {
   /* Theme colors */
   --color-primary: #009688;
+  --color-primary-o25: #00968840;
   --color-primary-dark: #00897B;
+  --bg-color: #FFF;
+  --text-color: #333;
+  --border-color: #DDD;
 
   /* Component-specific colors */
+  --color-dash: #00968840;
+  --color-dash-shadow: #00968840;
   --color-cell-crossed: #F44336;
+  --color-cell-crossed-o25: #F4433640;
   --color-filled-cells-progress-bar: #B2DFDB;
   --color-empty-cells-progress-bar: #FFCDD2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Theme colors */
+    --color-primary: #009688;
+    --color-primary-dark: #00897B;
+    --bg-color: #333;
+    --text-color: #FFF;
+    --border-color: #555;
+
+    /* Component-specific colors */
+    --color-dash: #222;
+    --color-dash-shadow: #00000040;
+    --color-cell-crossed: #F44336;
+    --color-filled-cells-progress-bar: #00695C;
+    --color-empty-cells-progress-bar: #C62828;
+  }
 }
 
 * {
@@ -22,6 +47,11 @@
   user-select: none;
 }
 
+body {
+  transition: 0.2s;
+  background: var(--bg-color);
+}
+
 #app {
-  padding: 50px;
+  padding: 30px;
 }

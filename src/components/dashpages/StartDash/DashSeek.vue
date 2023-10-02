@@ -1,4 +1,5 @@
 <script setup>
+import { toRaw } from 'vue';
 import config from '../../../config.json'
 
 import BoardSizeOption from '../../BoardSizeOption.vue';
@@ -8,19 +9,21 @@ const props = defineProps({
   seekOptions: Object
 })
 
+const emit = defineEmits(["boardSizeChanged", "gameModeChanged"])
+
 // Utility function to select board size
 function selectBoardSize(columns, rows) {
-  props.seekOptions.boardSize = { columns, rows }
+  emit("boardSizeChanged", { rows, columns })
 }
 
 // Utiliy function to select game mode
 function selectGameMode(mode) {
-  props.seekOptions.gameMode = mode
+  emit("gameModeChanged", mode)
 }
 
 // Utility function to check whether a board size option is the selected one
 function isBoardSizeSelected(columns, rows) {
-  return columns == props.seekOptions.boardSize.columns && rows == props.seekOptions.boardSize.rows
+  return columns == props.seekOptions.boardDimensions.columns && rows == props.seekOptions.boardDimensions.rows
 }
 
 // Utility function to check whether a game mode option is the selected one

@@ -26,6 +26,7 @@
   font-family: "Arial Rounded";
   font-size: 24px;
   line-height: 1;
-  text-align: center
+  text-align: center;
+  color: var(--text-color);
 }
 </style>

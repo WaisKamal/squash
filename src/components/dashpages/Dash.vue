@@ -6,22 +6,23 @@ import DashSeek from "./StartDash/DashSeek.vue";
 const props = defineProps({
   boardSizeOptions: Object,
   gameModeOptions: Object,
+  seekOptions: Object,
   gameStatus: String,
   playerData: Object
 })
 
-const emit = defineEmits(["dashButtonClicked"])
+const emit = defineEmits(["boardSizeChanged", "gameModeChanged", "dashButtonClicked"])
 
-let seekOptions = reactive({
-  boardSize: {
-    columns: 10,
-    rows: 10
-  },
-  gameMode: "1v1-online" // { "solo", "1v1-online", "1v1-local" }
-})
+function onBoardSizeChanged(boardSize) {
+  emit("boardSizeChanged", boardSize)
+}
+
+function onGameModeChanged(gameMode) {
+  emit("gameModeChanged", gameMode)
+}
 
 function seekButtonClicked() {
-  emit("dashButtonClicked", seekOptions.boardSize)
+  emit("dashButtonClicked", props.seekOptions.boardDimensions)
 }
 
 // Utility function to get button text from game status
@@ -37,13 +38,17 @@ function getButtonText() {
 
 <template>
   <div class="dash">
-    <DashSeek :seekOptions="seekOptions" v-show="props.gameStatus == 'nogame'"/>
+    <DashSeek
+      :seekOptions="seekOptions"
+      @boardSizeChanged="onBoardSizeChanged"
+      @gameModeChanged="onGameModeChanged"
+      v-show="gameStatus == 'nogame'"/>
     <DashGameStatus
-      :playerName="props.playerData.playerName"
-      :playerProgress="props.playerData.playerProgress"
-      :opponentName="props.playerData.opponentName"
-      :opponentProgress="props.playerData.opponentProgress"
-      v-if="props.gameStatus == 'playing'" />
+      :playerName="playerData.playerName"
+      :playerProgress="playerData.playerProgress"
+      :opponentName="playerData.opponentName"
+      :opponentProgress="playerData.opponentProgress"
+      v-if="gameStatus == 'playing'" />
     <button id="btn-play" @click="seekButtonClicked">{{ getButtonText() }}</button>
   </div>
 </template>
@@ -51,6 +56,11 @@ function getButtonText() {
 <style scoped>
 .dash {
   position: relative;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 50px 0px var(--color-dash-shadow);
+  transition: 0.2s;
+  background: var(--color-dash);
 }
 
 .dash #btn-play {

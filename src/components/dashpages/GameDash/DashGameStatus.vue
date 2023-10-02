@@ -34,7 +34,6 @@ setInterval(() => {
   display: flex;
   flex-direction: column;
   height: 360px;
-  justify-content: center;
   align-items: center;
 }
 </style>

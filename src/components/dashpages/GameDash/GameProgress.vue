@@ -26,12 +26,22 @@ let progressBarsData = computed(() => {
         :style="{ width: progressBarsData.filledCellsProgressBarWidth + '%' }">
         <div class="fluid" :style="{ width: progressBarsData.filledCellsProgress + '%' }"></div>
         <div class="handle" :style="{ left: progressBarsData.filledCellsProgress + '%' }"></div>
+        <div class="label"
+          style="transform: translateX(-50%);"
+          :style="{ left: progressBarsData.filledCellsProgress + '%' }">
+          {{ progressBarsData.filledCellsProgress.toFixed(2) + '% done' }}
+        </div>
       </div>
       <div
         class="progress-bar empty-cells"
         :style="{ width: progressBarsData.emptyCellsProgressBarWidth + '%' }">
         <div class="fluid" :style="{ width: progressBarsData.emptyCellsProgress + '%' }"></div>
         <div class="handle" :style="{ right: progressBarsData.emptyCellsProgress + '%' }"></div>
+        <div class="label"
+          style="transform: translateX(50%);"
+          :style="{ right: progressBarsData.emptyCellsProgress + '%' }">
+          {{ progressBarsData.emptyCellsProgress.toFixed(2) + '% done' }}
+        </div>
       </div>
     </div>
   </div>
@@ -44,25 +54,27 @@ let progressBarsData = computed(() => {
 
 .progress p {
   margin-bottom: 20px;
+  font-weight: bold;
+  color: var(--text-color);
 }
 
 .progress .progress-bar-wrapper {
   display: flex;
+  margin-bottom: 30px;
 }
 
 .progress .progress-bar {
   position: relative;
   width: 100%;
   height: 10px;
-  margin-bottom: 30px;
 }
 
 .progress .progress-bar.filled-cells {
-  background: var(--color-filled-cells-progress-bar);
+  background: var(--color-primary-o25);
 }
 
 .progress .progress-bar.empty-cells {
-  background: var(--color-empty-cells-progress-bar);
+  background: var(--color-cell-crossed-o25);
 }
 
 .progress .progress-bar .fluid {
@@ -100,4 +112,35 @@ let progressBarsData = computed(() => {
   transform: translateX(1px);
   background: var(--color-cell-crossed);
 }
+
+.progress .progress-bar .label {
+  position: absolute;
+  top: -42px;
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: 0.1s;
+  pointer-events: none;
+  opacity: 0;
+  color: #FFF;
+  background: #111;
+}
+
+.progress .progress-bar:hover .label {
+  top: -47px;
+  opacity: 1;
+  pointer-events: initial;
+}
+
+.progress .progress-bar .label::after {
+  content: "";
+  border: 10px solid transparent;
+  border-top: 10px solid #111;
+  position: absolute;
+  bottom: -20px;
+  left: calc(50% - 10px);
+}
+
 </style>

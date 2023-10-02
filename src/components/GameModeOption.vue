@@ -49,5 +49,6 @@ let props = defineProps({
   font-family: "Arial Rounded";
   font-size: 16px;
   text-align: center;
+  color: var(--text-color);
 }
 </style>

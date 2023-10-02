@@ -1,11 +1,27 @@
 <script setup>
 import { reactive, computed } from "vue"
+import { io } from "socket.io-client"
 
 // App configuration
 import config from "./config.json"
 
+// Socket.io
+// const socketUrl = process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
+// const socket = io(socketUrl)
+
+// socket.on("connect", () => {
+//   console.log("Connected to WebSocket")
+// })
+
+// socket.on("disconnect", () => {
+//   console.log("Connected to WebSocket")
+// })
+
+// socket.on("seekUpdate", updatedSeekRequests => {
+//   seekRequests = updatedSeekRequests
+// })
+
 // Components
-import Title from "./components/Title.vue"
 import Board from "./components/Board.vue"
 import Dash from "./components/dashpages/Dash.vue"
 import SeekTable from "./components/SeekTable.vue"
@@ -15,15 +31,7 @@ import utils from "./utils/utils"
 
 // Active seek requests
 let seekRequests = reactive([
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 },
-  { player: "Player", boardSize: { width: 10, height: 10 }, rating: 2000 }
+  { playerId: "player", playerName: "Player", boardDimensions: { rows: 5, columns: 5 }, rating: 2000 }
 ])
 
 let game = reactive({
@@ -31,20 +39,15 @@ let game = reactive({
     rows: 10,
     columns: 10,
   },
-  rowHeaders: [
-    [3],
-    [2, 2],
-    [1, 1, 1],
-    [2, 2],
-    [3]
-  ],
-  columnHeaders: [
-    [3],
-    [2, 2],
-    [1, 1, 1],
-    [2, 2],
-    [3]
-  ],
+  gameMode: "solo",
+  rowHeaders: {
+    haeders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
+    crossedStatus: [ false, false, false, false, false ] // true: crossed, false: not crossed
+  },
+  columnHeaders: {
+    haeders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
+    crossedStatus: [ false, false, false, false, false ] // true: crossed, false: not crossed
+  },
   filledCellsCount: 0,
   emptyCellsCount: 0,
   boardSizeOptions: config.boardSizeOptions,
@@ -56,7 +59,7 @@ let game = reactive({
     data: undefined,
     styleData: undefined,
     cellsAffirmed: 0,
-    cellsCrossed: 0
+    cellsCrossed: 0,
   },
   status: "nogame" // "nogame", "seek", "playing", "gameover"
 })
@@ -78,11 +81,11 @@ let playerData = computed(() => {
     opponentProgress: {
       filledCells: {
         marked: 0,
-        total: 0
+        total: game.filledCellsCount
       },
       emptyCells: {
         marked: 0,
-        total: 0
+        total: game.emptyCellsCount
       }
     },
   }
@@ -90,8 +93,8 @@ let playerData = computed(() => {
 
 // Generate board
 let boardConfig = utils.generateBoard(game.boardDimensions.rows, game.boardDimensions.columns)
-game.rowHeaders = boardConfig.rowHeaders
-game.columnHeaders = boardConfig.columnHeaders
+game.rowHeaders.headers = boardConfig.rowHeaders
+game.columnHeaders.headers = boardConfig.columnHeaders
 game.filledCellsCount = boardConfig.filledCellsCount
 game.emptyCellsCount = boardConfig.emptyCellsCount
 // Temporary: board data must be in server
@@ -99,14 +102,32 @@ game.boardData = boardConfig.board
 game.boardState.data = game.boardData.map(row => row.map(cell => 0))
 game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
 
-function dashButtonClicked(boardSize) {
+function setBoardDimensions(dimensions) {
+  game.boardDimensions = dimensions
+}
+
+function setGameMode(mode) {
+  game.gameMode = mode
+}
+
+async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
     game.status = "nogame"
   } else {
+    const seek = await utils.newSeek({
+      playerId: "Wais_m3198nfmdwd1",
+      boardDimensions: boardSize
+    })
+    seekRequests.length = 0  // Assigning to empty array disables reactivity
+    seekRequests.push(...seek)
+    // return;
+
     let boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
     game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
-    game.rowHeaders = boardConfig.rowHeaders
-    game.columnHeaders = boardConfig.columnHeaders
+    game.rowHeaders.headers = boardConfig.rowHeaders
+    game.rowHeaders.crossedStatus = boardConfig.rowHeaders.map(item => false)
+    game.columnHeaders.headers = boardConfig.columnHeaders
+    game.columnHeaders.crossedStatus = boardConfig.columnHeaders.map(item => false)
     game.filledCellsCount = boardConfig.filledCellsCount
     game.emptyCellsCount = boardConfig.emptyCellsCount
     // Temporary: board data must be in server
@@ -116,6 +137,10 @@ function dashButtonClicked(boardSize) {
     game.boardState.cellsAffirmed = game.boardState.cellsCrossed = 0
     game.status = "playing"
   }
+}
+
+function mouseLeftBoardGrid() {
+  game.boardState.selectedCells = []
 }
 
 function cellPressed(e) {
@@ -182,8 +207,18 @@ function cellHovered(e) {
 </script>
 
 <template>
-  <Title class="title" v-show="game.status == 'nogame'"/>
+  <h1 class="title" 
+    :style="{ fontSize: game.status == 'nogame' ? '64px' : '48px' }">Squash!</h1>
   <div class="content">
+    <Dash
+      :boardSizeOptions="game.boardSizeOptions"
+      :gameModeOptions="game.gameModeOptions"
+      :seekOptions="{ boardDimensions: game.boardDimensions, gameMode: game.gameMode }"
+      :gameStatus="game.status"
+      :playerData="playerData"
+      @boardSizeChanged="setBoardDimensions"
+      @gameModeChanged="setGameMode"
+      @dashButtonClicked="dashButtonClicked" />
     <Board
       :boardData="game.boardData"
       :dimensions="game.boardDimensions"
@@ -193,13 +228,8 @@ function cellHovered(e) {
       :gameStatus="game.status"
       @cellPressed="cellPressed"
       @cellReleased="cellReleased"
-      @cellHovered="cellHovered" />
-    <Dash
-      :boardSizeOptions="game.boardSizeOptions"
-      :gameModeOptions="game.gameModeOptions"
-      :gameStatus="game.status"
-      :playerData="playerData"
-      @dashButtonClicked="dashButtonClicked" />
+      @cellHovered="cellHovered"
+      @mouseLeftBoardGrid="mouseLeftBoardGrid" />
     <SeekTable :gameStatus="game.status" :seekRequests="seekRequests" />
   </div>
 </template>
@@ -208,10 +238,21 @@ function cellHovered(e) {
 .content {
   display: grid;
   grid-template-columns: max-content max-content;
-  grid-gap: 100px;
+  grid-gap: 50px;
   padding: 50px;
   justify-content: center;
   justify-items: center;
   align-items: center;
+}
+.title {
+  font-family: "Arial Rounded";
+  font-size: 64px;
+  text-align: center;
+  transition: 0.2s;
+  color: var(--color-primary);
+}
+
+.title.hide {
+  display: none;
 }
 </style>

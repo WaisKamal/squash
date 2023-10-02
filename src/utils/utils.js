@@ -101,4 +101,26 @@ function generateBoard(rows, columns) {
   return { board, rowHeaders, columnHeaders, filledCellsCount, emptyCellsCount }
 }
 
-export default { generateBoard, generateBoard2 }
+async function newSeek(options) {
+  // Request seek
+  const seek = await fetch("http://localhost:3000/seek/new", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      playerId: options.playerId,
+      boardDimensions: options.boardDimensions
+    })
+  }).then(res => res.json())
+  return seek.map(seekRequest => {
+    return {
+      playerId: seekRequest.playerId,
+      playerName: seekRequest.playerId,
+      boardDimensions: seekRequest.boardDimensions,
+      rating: 2000
+    }
+  })
+}
+
+export default { generateBoard, generateBoard2, newSeek }
