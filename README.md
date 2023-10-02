@@ -1,5 +1,7 @@
 # Squash!
 
+![screenshot of a Squash! game](screenshot.png)
+
 Squash is a multiplayer board game where players solve a numbers riddle by utilizing the given hints. Inspired by [Detective Riddles - Sherlock's Heritage](https://store.steampowered.com/app/1546340/Detective_Riddles__Sherlocks_Heritage/), the game supports multiplayer matches where players battle it on time to correctly fill in all squares on the board.
 
 ## Requirements
