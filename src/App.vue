@@ -114,12 +114,14 @@ async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
     game.status = "nogame"
   } else {
-    const seek = await utils.newSeek({
-      playerId: "Wais_m3198nfmdwd1",
-      boardDimensions: boardSize
-    })
-    seekRequests.length = 0  // Assigning to empty array disables reactivity
-    seekRequests.push(...seek)
+    if (game.gameMode == "1v1-online") {
+      const seek = await utils.newSeek({
+        playerId: "Wais_m3198nfmdwd1",
+        boardDimensions: boardSize
+      })
+      seekRequests.length = 0  // Assigning to empty array disables reactivity
+      seekRequests.push(...seek)
+    }
     // return;
 
     let boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
