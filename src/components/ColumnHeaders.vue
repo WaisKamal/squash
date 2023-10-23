@@ -39,7 +39,7 @@
   color: var(--text-color);
 }
 
-.row-headers .header .item::after {
+.column-headers .header .item::after {
   content: "";
   position: absolute;
   top: 5px;
@@ -52,7 +52,7 @@
   background: linear-gradient(90deg, var(--bg-color) 50%, var(--text-color) 50%);
 }
 
-.row-headers .header .item.crossed::after {
+.column-headers .header .item.crossed::after {
   transform: rotate(45deg) translate(-50%, -50%) scaleY(1) translate(50%, 50%);
 }
 </style>
