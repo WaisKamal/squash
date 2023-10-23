@@ -31,6 +31,7 @@
 }
 
 .column-headers .header .item {
+  position: relative;
   display: flex;
   width: 30px;
   height: 20px;
@@ -42,8 +43,8 @@
 .column-headers .header .item::after {
   content: "";
   position: absolute;
-  top: 5px;
-  left: 8px;
+  top: 0px;
+  left: 13px;
   width: 4px;
   height: 20px;
   border-radius: 2px;
