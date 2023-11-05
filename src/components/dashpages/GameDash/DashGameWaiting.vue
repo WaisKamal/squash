@@ -1,0 +1,85 @@
+<script setup>
+import { ref, toRaw } from 'vue';
+let props = defineProps({
+  gameUrl: String
+})
+
+let urlField = ref()
+let btnCopy = ref()
+
+async function selectUrlAndCopy() {
+  try {
+    await navigator.clipboard.writeText(urlField.value.innerHTML)
+    btnCopy.value.innerHTML = "Copied"
+    setTimeout(() => btnCopy.value.innerHTML = "Copy", 2000)
+  } catch (err) {
+    console.error('Failed to copy: ', err)
+  }
+}
+</script>
+
+<template>
+  <div class="wait-dash">
+    <h3>Waiting for opponent</h3>
+    <p>The game will start when someone joins using this invite link</p>
+    <div class="url-container">
+      <div class="url-field" ref="urlField">{{ gameUrl }}</div>
+      <button
+        class="btn-copy" 
+        ref="btnCopy"
+        @click="selectUrlAndCopy">Copy</button>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.wait-dash {
+  height: 360px;
+
+}
+.wait-dash h3 {
+  font-family: "Arial Rounded";
+  font-size: 32px;
+  color: var(--color-primary);
+}
+
+.wait-dash p {
+  margin-top: 20px;
+  font-size: 24px;
+  color: #FFF;
+}
+
+.wait-dash .url-container {
+  display: flex;
+  margin-top: 20px;
+  user-select: text !important;
+}
+
+.wait-dash .url-container .url-field {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  user-select: all;
+  color: #FFF;
+  background: #00000080;
+}
+
+
+.wait-dash .url-container button {
+  margin-left: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  font-family: "Arial Rounded";
+  font-size: 16px;
+  cursor: pointer;
+  color: #FFF;
+  background: var(--color-primary);
+}
+
+.wait-dash .url-container button:hover {
+  background: var(--color-primary-dark);
+}
+</style>

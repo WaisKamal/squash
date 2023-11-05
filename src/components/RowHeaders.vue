@@ -1,9 +1,11 @@
 <script setup>
 import { toRaw } from 'vue';
 
-  const props = defineProps({
-    rowHeaders: Object
-  })
+const props = defineProps({
+  rowHeaders: Array
+})
+
+console.log(toRaw(props.rowHeaders))
 </script>
 
 <template>
@@ -11,7 +13,7 @@ import { toRaw } from 'vue';
     <div class="header" v-for="header in rowHeaders.headers">
       <div
         class="item"
-        :class="{ 'crossed': rowHeaders.crossedStatus[index] }"
+        :class="{ 'crossed': false }"
         v-for="(item, index) in header">{{ item }}</div>
     </div>
   </div>

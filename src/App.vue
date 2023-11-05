@@ -40,14 +40,8 @@ let game = reactive({
     columns: 10,
   },
   gameMode: "solo",
-  rowHeaders: {
-    haeders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
-    crossedStatus: [ false, false, false, false, false ] // true: crossed, false: not crossed
-  },
-  columnHeaders: {
-    haeders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
-    crossedStatus: [ false, false, false, false, false ] // true: crossed, false: not crossed
-  },
+  rowHeaders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
+  columnHeaders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
   filledCellsCount: 0,
   emptyCellsCount: 0,
   boardSizeOptions: config.boardSizeOptions,
@@ -61,7 +55,7 @@ let game = reactive({
     cellsAffirmed: 0,
     cellsCrossed: 0,
   },
-  status: "nogame" // "nogame", "seek", "playing", "gameover"
+  status: "seek" // "nogame", "seek", "playing", "gameover"
 })
 
 let playerData = computed(() => {
@@ -113,7 +107,9 @@ function setGameMode(mode) {
 async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
     game.status = "nogame"
-  } else {
+  } else if (game.status == "seek") {
+    game.status = "nogame"
+  } else if (game.status == "nogame") {
     if (game.gameMode == "1v1-online") {
       const seek = await utils.newSeek({
         playerId: "Wais_m3198nfmdwd1",
@@ -127,9 +123,7 @@ async function dashButtonClicked(boardSize) {
     let boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
     game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
     game.rowHeaders.headers = boardConfig.rowHeaders
-    game.rowHeaders.crossedStatus = boardConfig.rowHeaders.map(item => false)
     game.columnHeaders.headers = boardConfig.columnHeaders
-    game.columnHeaders.crossedStatus = boardConfig.columnHeaders.map(item => false)
     game.filledCellsCount = boardConfig.filledCellsCount
     game.emptyCellsCount = boardConfig.emptyCellsCount
     // Temporary: board data must be in server
@@ -210,7 +204,7 @@ function cellHovered(e) {
 
 <template>
   <h1 class="title" 
-    :style="{ fontSize: game.status == 'nogame' ? '64px' : '48px' }">Squash!</h1>
+    :style="{ fontSize: game.status == 'playing' ? '48px' : '64px' }">Squash!</h1>
   <div class="content">
     <Dash
       :boardSizeOptions="game.boardSizeOptions"

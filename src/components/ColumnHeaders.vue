@@ -1,6 +1,6 @@
 <script setup>
   const props = defineProps({
-    columnHeaders: Object
+    columnHeaders: Array
   })
 </script>
 
@@ -9,7 +9,7 @@
     <div class="header" v-for="header in columnHeaders.headers">
       <div
         class="item"
-        :class="{ 'crossed': columnHeaders.crossedStatus[index] }"
+        :class="{ 'crossed': false }"
         v-for="(item, index) in header">{{ item }}</div>
     </div>
   </div>

@@ -2,6 +2,7 @@
 import { reactive, toRaw } from "vue"
 import DashGameStatus from "./GameDash/DashGameStatus.vue";
 import DashSeek from "./StartDash/DashSeek.vue";
+import DashGameWaiting from "./GameDash/DashGameWaiting.vue";
 
 const props = defineProps({
   boardSizeOptions: Object,
@@ -29,11 +30,14 @@ function seekButtonClicked() {
 function getButtonText() {
   const statusToText = {
     "nogame": "Play",
+    "seek": "Cancel",
     "playing": "Quit game",
     "gameover": "Play again"
   }
   return statusToText[props.gameStatus]
 }
+
+let gameUrl = "https://squash.com/oaiefuew"
 </script>
 
 <template>
@@ -43,6 +47,9 @@ function getButtonText() {
       @boardSizeChanged="onBoardSizeChanged"
       @gameModeChanged="onGameModeChanged"
       v-show="gameStatus == 'nogame'"/>
+    <DashGameWaiting
+      :gameUrl="gameUrl"
+      v-show="gameStatus == 'seek'" />
     <DashGameStatus
       :playerName="playerData.playerName"
       :playerProgress="playerData.playerProgress"
@@ -56,6 +63,7 @@ function getButtonText() {
 <style scoped>
 .dash {
   position: relative;
+  width: 440px;
   padding: 40px;
   border-radius: 10px;
   box-shadow: 0px 0px 50px 0px var(--color-dash-shadow);

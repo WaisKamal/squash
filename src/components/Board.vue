@@ -9,8 +9,8 @@ const emit = defineEmits(["cellPressed", "cellReleased", "cellHovered", "mouseLe
 // Board data
 const data = defineProps({
   dimensions: Object,    // Board dimensions - { rows, columns }
-  rowHeaders: Object,    // Row headers
-  columnHeaders: Object, // Column headers
+  rowHeaders: Array,     // Row headers
+  columnHeaders: Array,  // Column headers
   boardData: Array,      // 2D array (true = cell to be affirmed, false = cell to be crossed)
   state: Object,         // {
                          //   data: 2D array of cells (0 = empty, 1 = affirmed, 2 = crossed)
@@ -65,7 +65,6 @@ function cellExists(arr, cellOrder) {
   let column = (cellOrder - 1) % data.dimensions.columns
   return arr.filter(cell => cell.row == row && cell.column == column).length > 0
 }
-
 
 // Utility function to get cell row and column
 function getCellRowAndColumn(cellOrder) {
@@ -126,6 +125,7 @@ function getCellNumber(cellOrder) {
   grid-template-columns: min-content min-content;
   grid-gap: 1px;
   border-radius: 50px 0px 0px 0px;
+  user-select: none;
 }
 
 .board .grid {
