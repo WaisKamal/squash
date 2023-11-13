@@ -1,8 +1,0 @@
-{
-    "rewrites": [
-        { "source": "/", "destination": "/" },
-        { "source": "/api/player", "destination": "/" },
-        { "source": "/pusher/auth", "destination": "/" },
-        { "source": "/pusher/user-auth", "destination": "/" }
-    ]
-}
