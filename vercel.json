@@ -1,8 +1,8 @@
 {
     "rewrites": [
-        { "source": "/api/player", "destination": "/server" },
-        { "source": "/pusher/auth", "destination": "/server" },
-        { "source": "/pusher/user-auth", "destination": "/server" },
-        { "source": "/", "destination": "/server" }
+        { "source": "/api/player", "destination": "/api" },
+        { "source": "/pusher/auth", "destination": "/api" },
+        { "source": "/pusher/user-auth", "destination": "/api" },
+        { "source": "/", "destination": "/api" }
     ]
 }
