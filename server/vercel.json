@@ -1,8 +1,8 @@
 {
     "rewrites": [
-        { "source": "/time", "destination": "/api" },
-        { "source": "/schedule", "destination": "/api" },
-        { "source": "/curateall", "destination": "/api" },
-        { "source": "/joinliga", "destination": "/api"}
+        { "source": "/", "destination": "/" },
+        { "source": "/api/player", "destination": "/" },
+        { "source": "/pusher/auth", "destination": "/" },
+        { "source": "/pusher/user-auth", "destination": "/" }
     ]
 }
