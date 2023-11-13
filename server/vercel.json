@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        { "source": "/time", "destination": "/api" },
+        { "source": "/schedule", "destination": "/api" },
+        { "source": "/curateall", "destination": "/api" },
+        { "source": "/joinliga", "destination": "/api"}
+    ]
+}
