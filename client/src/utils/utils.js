@@ -101,26 +101,17 @@ function generateBoard(rows, columns) {
   return { board, rowHeaders, columnHeaders, filledCellsCount, emptyCellsCount }
 }
 
-async function newSeek(options) {
-  // Request seek
-  const seek = await fetch("http://localhost:3000/seek/new", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      playerId: options.playerId,
-      boardDimensions: options.boardDimensions
-    })
-  }).then(res => res.json())
-  return seek.map(seekRequest => {
-    return {
-      playerId: seekRequest.playerId,
-      playerName: seekRequest.playerId,
-      boardDimensions: seekRequest.boardDimensions,
-      rating: 2000
-    }
-  })
+function generateRandomString(length) {
+  const chars = [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+  ];
+  const id = []
+  for (var i = 0; i < length; i++) {
+    id.push(chars[Math.floor(Math.random() * chars.length)])
+  }
+  return id.join("")
 }
 
-export default { generateBoard, generateBoard2, newSeek }
+export default { generateBoard, generateBoard2, generateRandomString }

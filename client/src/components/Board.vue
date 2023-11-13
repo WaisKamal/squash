@@ -90,7 +90,7 @@ function getCellNumber(cellOrder) {
 </script>
 
 <template>
-  <div class="board" v-if="data.gameStatus != 'nogame'">
+  <div class="board" v-if="data.gameStatus == 'playing'">
     <div></div>
     <ColumnHeaders :columnHeaders="columnHeaders" />
     <RowHeaders :rowHeaders="rowHeaders" />
