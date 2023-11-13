@@ -81,6 +81,6 @@ app.post("/pusher/user-auth", (req, res) => {
     res.send(userAuth)
 })
 
-app.listen(port, () => console.log(`Squash server running on port ${port}`))
+// app.listen(port, () => console.log(`Squash server running on port ${port}`))
 
 export default app
