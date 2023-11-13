@@ -1,0 +1,16 @@
+{
+    "name": "squash",
+    "type": "module",
+    "version": "0.0.1",
+    "description": "A strategy board game",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.18.2",
+        "express-session": "^1.17.3",
+        "pusher": "^5.1.3",
+        "socket.io": "^4.7.2"
+    },
+    "scripts": {
+        "start": "node index.js"
+    }
+}

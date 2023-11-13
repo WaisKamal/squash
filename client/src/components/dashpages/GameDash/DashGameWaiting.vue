@@ -24,10 +24,7 @@ async function selectUrlAndCopy() {
     <p>The game will start when someone joins using this invite link</p>
     <div class="url-container">
       <div class="url-field" ref="urlField">{{ gameUrl }}</div>
-      <button
-        class="btn-copy" 
-        ref="btnCopy"
-        @click="selectUrlAndCopy">Copy</button>
+      <button ref="btnCopy" @click="selectUrlAndCopy">Copy</button>
     </div>
   </div>
 </template>
@@ -57,9 +54,12 @@ async function selectUrlAndCopy() {
 
 .wait-dash .url-container .url-field {
   width: 100%;
+  min-width: 0px;
   padding: 10px;
   border-radius: 5px;
   font-size: 16px;
+  text-wrap: nowrap;
+  overflow: auto;
   user-select: all;
   color: #FFF;
   background: #00000080;

@@ -8,7 +8,7 @@ let props = defineProps({
 </script>
 
 <template>
-  <div class="seek-table" v-show="props.gameStatus == 'nogame'">
+  <div class="seek-table" v-show="props.gameStatus != 'playing'">
     <table border="0">
       <thead>
         <tr>

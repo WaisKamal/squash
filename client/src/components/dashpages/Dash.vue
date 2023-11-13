@@ -3,16 +3,18 @@ import { reactive, toRaw } from "vue"
 import DashGameStatus from "./GameDash/DashGameStatus.vue";
 import DashSeek from "./StartDash/DashSeek.vue";
 import DashGameWaiting from "./GameDash/DashGameWaiting.vue";
+import DashGameJoin from "./GameDash/DashGameJoin.vue";
 
 const props = defineProps({
   boardSizeOptions: Object,
   gameModeOptions: Object,
   seekOptions: Object,
+  gameUrl: String,
   gameStatus: String,
-  playerData: Object
+  playerData: Object,
 })
 
-const emit = defineEmits(["boardSizeChanged", "gameModeChanged", "dashButtonClicked"])
+const emit = defineEmits(["boardSizeChanged", "gameModeChanged", "dashButtonClicked", "joinButtonClicked"])
 
 function onBoardSizeChanged(boardSize) {
   emit("boardSizeChanged", boardSize)
@@ -26,18 +28,21 @@ function seekButtonClicked() {
   emit("dashButtonClicked", props.seekOptions.boardDimensions)
 }
 
+function joinButtonClicked(gameUrl) {
+  emit("joinButtonClicked", gameUrl)
+}
+
 // Utility function to get button text from game status
 function getButtonText() {
   const statusToText = {
     "nogame": "Play",
     "seek": "Cancel",
+    "join": "Cancel",
     "playing": "Quit game",
     "gameover": "Play again"
   }
   return statusToText[props.gameStatus]
 }
-
-let gameUrl = "https://squash.com/oaiefuew"
 </script>
 
 <template>
@@ -50,6 +55,10 @@ let gameUrl = "https://squash.com/oaiefuew"
     <DashGameWaiting
       :gameUrl="gameUrl"
       v-show="gameStatus == 'seek'" />
+    <DashGameJoin
+      :gameUrl="gameUrl"
+      @joinButtonClicked="joinButtonClicked"
+      v-show="gameStatus == 'join'" />
     <DashGameStatus
       :playerName="playerData.playerName"
       :playerProgress="playerData.playerProgress"

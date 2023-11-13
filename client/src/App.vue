@@ -1,25 +1,9 @@
 <script setup>
 import { reactive, computed } from "vue"
-import { io } from "socket.io-client"
+import Pusher from "pusher-js"
 
 // App configuration
 import config from "./config.json"
-
-// Socket.io
-// const socketUrl = process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000";
-// const socket = io(socketUrl)
-
-// socket.on("connect", () => {
-//   console.log("Connected to WebSocket")
-// })
-
-// socket.on("disconnect", () => {
-//   console.log("Connected to WebSocket")
-// })
-
-// socket.on("seekUpdate", updatedSeekRequests => {
-//   seekRequests = updatedSeekRequests
-// })
 
 // Components
 import Board from "./components/Board.vue"
@@ -29,16 +13,39 @@ import SeekTable from "./components/SeekTable.vue"
 // Utility functions
 import utils from "./utils/utils"
 
-// Active seek requests
-let seekRequests = reactive([
-  { playerId: "player", playerName: "Player", boardDimensions: { rows: 5, columns: 5 }, rating: 2000 }
-])
+// Development only
+const userAuthEndpoint = "http://localhost:3000/pusher/user-auth"
+const channelAuthEndpoint = "http://localhost:3000/pusher/auth"
+const playerDataEndpoint = "http://localhost:3000/api/player"
+
+const pusher = new Pusher("7ac779fdc52b29158df6", {
+  userAuthentication: {
+    endpoint: userAuthEndpoint,
+  },
+  channelAuthorization: {
+    endpoint: channelAuthEndpoint,
+  },
+  cluster: 'ap2',
+  forceTLS: true,
+})
+pusher.signin()
+
+let playerId;
+const fetchPlayerId = async () => {
+  const player = await fetch(playerDataEndpoint).then(res => res.json())
+  playerId = player.playerId
+  console.log(playerId)
+}
+fetchPlayerId()
+
+let gameChannel = null
 
 let game = reactive({
   boardDimensions: {
     rows: 10,
     columns: 10,
   },
+  gameId: "hello",
   gameMode: "solo",
   rowHeaders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
   columnHeaders: [ [3], [2, 2], [1, 1, 1], [2, 2], [3] ],
@@ -53,9 +60,13 @@ let game = reactive({
     data: undefined,
     styleData: undefined,
     cellsAffirmed: 0,
-    cellsCrossed: 0,
+    cellsCrossed: 0
   },
-  status: "seek" // "nogame", "seek", "playing", "gameover"
+  opponentProgress: {
+    cellsAffirmed: 0,
+    cellsCrossed: 0
+  },
+  status: "nogame" // "nogame", "seek", "playing", "gameover"
 })
 
 let playerData = computed(() => {
@@ -74,11 +85,11 @@ let playerData = computed(() => {
     opponentName: "Opponent",
     opponentProgress: {
       filledCells: {
-        marked: 0,
+        marked: game.opponentProgress.cellsAffirmed,
         total: game.filledCellsCount
       },
       emptyCells: {
-        marked: 0,
+        marked: game.opponentProgress.cellsCrossed,
         total: game.emptyCellsCount
       }
     },
@@ -104,35 +115,94 @@ function setGameMode(mode) {
   game.gameMode = mode
 }
 
+function startGame(boardConfig) {
+  game.boardDimensions = { columns: boardConfig.columnHeaders.length, rows: boardConfig.rowHeaders.length }
+  game.rowHeaders.headers = boardConfig.rowHeaders
+  game.columnHeaders.headers = boardConfig.columnHeaders
+  game.filledCellsCount = boardConfig.filledCellsCount
+  game.emptyCellsCount = boardConfig.emptyCellsCount
+  // Temporary: board data must be in server
+  game.boardData = boardConfig.board
+  game.boardState.data = game.boardData.map(row => row.map(cell => 0))
+  game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
+  game.boardState.cellsAffirmed = game.boardState.cellsCrossed = 0
+  game.status = "playing"
+}
+
 async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
     game.status = "nogame"
-  } else if (game.status == "seek") {
+    gameChannel.trigger("client-game-left", {})
+    pusher.unsubscribe(gameChannel.name)
+  } else if (game.status == "seek" || game.status == "join") {
     game.status = "nogame"
   } else if (game.status == "nogame") {
-    if (game.gameMode == "1v1-online") {
-      const seek = await utils.newSeek({
-        playerId: "Wais_m3198nfmdwd1",
-        boardDimensions: boardSize
+    if (game.gameMode == "1v1-new") {
+      // const channelId = await fetch("http://localhost:3000/seek/new", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json"
+      //   },
+      //   body: JSON.stringify({
+      //     playerId: playerId,
+      //     boardDimensions: boardSize
+      //   })
+      // }).then(res => res.json())
+      game.gameId = utils.generateRandomString(8)
+      const channelId = "presence-" + game.gameId
+      const channelData = {
+        channel_name: channelId,
+        user_id: playerId,
+        user_info: {
+          name: "Player " + playerId.split("-").pop()
+        }
+      }
+      gameChannel = pusher.subscribe(channelId)
+      gameChannel.bind("pusher:subscription_succeeded", () => {
+        console.log("Subscribed to channel", gameChannel)
       })
-      seekRequests.length = 0  // Assigning to empty array disables reactivity
-      seekRequests.push(...seek)
+      gameChannel.bind("pusher:member_added", () => {
+        const boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
+        // Send board configuration to the other player
+        gameChannel.trigger("client-board-config", boardConfig)
+        startGame(boardConfig)
+      })
+      gameChannel.bind("client-progress-updated", data => {
+        game.opponentProgress.cellsAffirmed = data.cellsAffirmed
+        game.opponentProgress.cellsCrossed = data.cellsCrossed
+      })
+      gameChannel.bind("client-game-left", () => {
+        game.status = "nogame"
+        pusher.unsubscribe(gameChannel.name)
+      })
+      game.status = "seek"
+    } else if (game.gameMode == "1v1-join") {
+      game.status = "join"
+    } else if (game.gameMode == "solo") {
+      const boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
+      startGame(boardConfig)
     }
-    // return;
-
-    let boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
-    game.boardDimensions = { columns: boardSize.columns, rows: boardSize.rows }
-    game.rowHeaders.headers = boardConfig.rowHeaders
-    game.columnHeaders.headers = boardConfig.columnHeaders
-    game.filledCellsCount = boardConfig.filledCellsCount
-    game.emptyCellsCount = boardConfig.emptyCellsCount
-    // Temporary: board data must be in server
-    game.boardData = boardConfig.board
-    game.boardState.data = game.boardData.map(row => row.map(cell => 0))
-    game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
-    game.boardState.cellsAffirmed = game.boardState.cellsCrossed = 0
-    game.status = "playing"
   }
+}
+
+function joinButtonClicked(gameUrl) {
+  const gameId = gameUrl.split("/").pop()
+  const channelId = `presence-${gameId}`
+  gameChannel = pusher.subscribe(channelId)
+  gameChannel.bind("pusher:subscription_succeeded", () => {
+    console.log("Subscribed to channel", gameChannel)
+  })
+  gameChannel.bind("client-board-config", data => {
+    startGame(data)
+  })
+  gameChannel.bind("client-progress-updated", data => {
+    game.opponentProgress.cellsAffirmed = data.cellsAffirmed
+    game.opponentProgress.cellsCrossed = data.cellsCrossed
+  })
+  gameChannel.bind("client-game-left", () => {
+    game.status = "nogame"
+    pusher.unsubscribe(gameChannel.name)
+  })
 }
 
 function mouseLeftBoardGrid() {
@@ -158,21 +228,26 @@ function cellReleased() {
   // NOTE: does not apply penalties
   let index = 0
   game.boardState.selectedCells.forEach(cell => {
-    if (game.boardState.data[cell.row][cell.column] == 0) {
+    const { row, column } = cell
+    if (game.boardState.data[row][column] == 0) {
       // First modify boardState.data
-      if (game.boardData[cell.row][cell.column]) {
-        game.boardState.data[cell.row][cell.column] = 1
+      if (game.boardData[row][column]) {
+        game.boardState.data[row][column] = 1
         game.boardState.cellsAffirmed++
       } else {
-        game.boardState.data[cell.row][cell.column] = 2
+        game.boardState.data[row][column] = 2
         game.boardState.cellsCrossed++
       }
       // Then modify boardState.styleData
       setTimeout(() => {
-        game.boardState.styleData[cell.row][cell.column] = game.boardData[cell.row][cell.column] ? 1 : 2
+        game.boardState.styleData[row][column] = game.boardData[row][column] ? 1 : 2
       }, index++ * 100)
     }
   })
+  setTimeout(() => gameChannel.trigger("client-progress-updated", {
+    cellsAffirmed: game.boardState.cellsAffirmed,
+    cellsCrossed: game.boardState.cellsCrossed
+  }), 0)
   // Clear selected cells
   game.boardState.selectedCells = []
 }
@@ -210,11 +285,13 @@ function cellHovered(e) {
       :boardSizeOptions="game.boardSizeOptions"
       :gameModeOptions="game.gameModeOptions"
       :seekOptions="{ boardDimensions: game.boardDimensions, gameMode: game.gameMode }"
+      :gameUrl="'squash-game.vercel.app/' + game.gameId"
       :gameStatus="game.status"
       :playerData="playerData"
       @boardSizeChanged="setBoardDimensions"
       @gameModeChanged="setGameMode"
-      @dashButtonClicked="dashButtonClicked" />
+      @dashButtonClicked="dashButtonClicked"
+      @joinButtonClicked="joinButtonClicked" />
     <Board
       :boardData="game.boardData"
       :dimensions="game.boardDimensions"
@@ -226,7 +303,7 @@ function cellHovered(e) {
       @cellReleased="cellReleased"
       @cellHovered="cellHovered"
       @mouseLeftBoardGrid="mouseLeftBoardGrid" />
-    <SeekTable :gameStatus="game.status" :seekRequests="seekRequests" />
+    <SeekTable :gameStatus="game.status" :seekRequests="[]" />
   </div>
 </template>
 
