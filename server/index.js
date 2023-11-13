@@ -36,6 +36,8 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + '/public/index.html')
 })
 
+app.use(express.static("public"))
+
 app.get("/api/player", (req, res) => {
     if (!req.session.playerId) {
         req.session.playerId = "player-" + utils.generateGameId()
@@ -44,29 +46,6 @@ app.get("/api/player", (req, res) => {
         playerId: req.session.playerId
     }
     res.send(JSON.stringify(result))
-})
-
-app.use(express.static("public"))
-
-app.post("/game/new", (req, res) => {
-    const playerId = req.body.playerId
-    const boardDimensions = req.body.boardDimensions
-
-    // Generate a random 8-character gameId
-    const gameId = utils.generateGameId()
-    // Create new Pusher channel from gameId
-    const channelId = `channel-${gameId}`
-
-    res.send(JSON.stringify({ channelId }))
-})
-
-app.post("/game/join", (req, res) => {
-    const playerId = req.body.playerId
-    const gameId = req.body.gameId
-
-    const channelId = `channel-${gameId}`
-
-    res.send(JSON.stringify({ gameId }))
 })
 
 app.post("/pusher/auth", (req, res) => {
