@@ -3,10 +3,10 @@
         { "source": "/api/player", "destination": "/api" },
         { "source": "/pusher/auth", "destination": "/api" },
         { "source": "/pusher/user-auth", "destination": "/api" },
-        { "source": "/play", "destination": "/api" },
-        { "source": "/", "destination": "/api/play"}
+        { "source": "/play", "destination": "/api" }
     ],
     "redirects": [
-        { "source": "/assets/:path", "destination": "/public/assets/:path" }
+        { "source": "/assets/:path", "destination": "/public/assets/:path" },
+        { "source": "/", "destination": "/play"}
     ]
 }
