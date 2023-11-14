@@ -43,7 +43,7 @@ async function selectUrlAndCopy() {
 .wait-dash p {
   margin-top: 20px;
   font-size: 24px;
-  color: #FFF;
+  color: var(--text-color);
 }
 
 .wait-dash .url-container {
@@ -61,8 +61,8 @@ async function selectUrlAndCopy() {
   text-wrap: nowrap;
   overflow: auto;
   user-select: all;
-  color: #FFF;
-  background: #00000080;
+  color: var(--text-color);
+  background: var(--color-dash-text-field);
 }
 
 

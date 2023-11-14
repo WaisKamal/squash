@@ -15,6 +15,7 @@
   /* Component-specific colors */
   --color-dash: #00968840;
   --color-dash-shadow: #00968840;
+  --color-dash-text-field: #FFFFFF80;
   --color-cell-crossed: #F44336;
   --color-cell-crossed-o25: #F4433640;
   --color-filled-cells-progress-bar: #B2DFDB;
@@ -33,6 +34,7 @@
     /* Component-specific colors */
     --color-dash: #222;
     --color-dash-shadow: #00000040;
+    --color-dash-text-field: #00000080;
     --color-cell-crossed: #F44336;
     --color-filled-cells-progress-bar: #00695C;
     --color-empty-cells-progress-bar: #C62828;

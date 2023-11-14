@@ -36,7 +36,7 @@ const emit = defineEmits(["joinButtonClicked"])
 .join-dash p {
   margin-top: 20px;
   font-size: 24px;
-  color: #FFF;
+  color: var(--text-color);
 }
 
 .join-dash .url-container {
@@ -53,8 +53,8 @@ const emit = defineEmits(["joinButtonClicked"])
   outline: none;
   font-size: 16px;
   user-select: all;
-  color: #FFF;
-  background: #00000080;
+  color: var(--text-color);
+  background: var(--color-dash-text-field);
 }
 
 .join-dash .url-container .url-field:focus {
