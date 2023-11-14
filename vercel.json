@@ -1,9 +1,9 @@
 {
     "rewrites": [
-        { "source": "/api/player", "destination": "/api" },
-        { "source": "/pusher/auth", "destination": "/api" },
-        { "source": "/pusher/user-auth", "destination": "/api" },
-        { "source": "/play", "destination": "/api" }
+        { "source": "/api/player", "destination": "/api/public" },
+        { "source": "/pusher/auth", "destination": "/api/public" },
+        { "source": "/pusher/user-auth", "destination": "/api/public" },
+        { "source": "/play", "destination": "/api/public" }
     ],
     "redirects": [
         { "source": "/assets/:path", "destination": "/public/assets/:path" },
