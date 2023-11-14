@@ -22,7 +22,9 @@ app.use(session({
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded())
-app.use(express.static("public"))
+app.use(express.static("public", {
+    index: false
+}))
 
 const pusher = new Pusher({
     appId: "1677874",
@@ -36,7 +38,6 @@ app.get("/play", (req, res) => {
     req.session.playerId = "player-" + utils.generateGameId()
     res.sendFile(__dirname + '/public/index.html')
 })
-
 
 app.get("/api/player", (req, res) => {
     if (!req.session.playerId) {
