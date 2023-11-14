@@ -15,15 +15,40 @@ Squash is a multiplayer board game where players solve a numbers riddle by utili
 ## Run locally
 
 **This game is under development.** Follow these steps to test the game in your local machine:
-  1. Install the required depndencies
+  1. First, you will need a running Pusher channels app, so go and [create one](https://dashboard.pusher.com/channels). You will also need to [create a Pusher account](https://dashboard.pusher.com/accounts/sign_up) before you can create a Pusher app.
 
+  2. When your Pusher app is ready, go to your app's dashboard and select "App Keys" on the left. You will need to configure the client and server with these keys.
+
+     In the `api` folder, open `index.js` in your preferred editor and update the default app keys near the top of the file.
+
+         const APP_ID_DEFAULT = "your_app_id_here"
+         const APP_KEY_DEFAULT = "your_app_key_here"
+         const APP_SECRET_DEFAULT = "your_app_secret_here"
+         const APP_CLUSTER_DEFAULT = "your_app_cluster_here"
+
+     In the `client/src` folder, open `config.json` in your preferred editor and update the `appKey` entry.
+
+         {
+           "appKey": "a3fff4c418b83c2b12db",
+           ...
+         }
+
+  3. cd into the `client` directory, install the required dependencies and build the Vue.js app.
+
+         cd client
+         npm install
+         npm run build
+
+  4. cd into the `server` directory and install the required dependencies.
+
+         cd ../api
          npm install
 
-  2. Run the development server
+  5. Run the game server. It uses port 3000 by default
+  
+         npm start
 
-         npm run dev
-
-  3. You should now see a URL similar to `http://localhost:<port>` in the console. Open that URL in your browser.
+  6. Open [`http://localhost:3000`](`http://localhost:3000`) in your browser.
 
 ## Contribute
 

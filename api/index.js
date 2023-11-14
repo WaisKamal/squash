@@ -6,6 +6,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import utils from './_utils.js';
 
+const APP_ID_DEFAULT = "your_app_id_here"
+const APP_KEY_DEFAULT = "your_app_key_here"
+const APP_SECRET_DEFAULT = "your_app_secret_here"
+const APP_CLUSTER_DEFAULT = "your_app_cluster_here"
+
+const APP_ID = process.env.APP_ID || APP_ID_DEFAULT
+const APP_KEY = process.env.APP_KEY || APP_KEY_DEFAULT
+const APP_SECRET = process.env.APP_SECRET || APP_SECRET_DEFAULT
+const APP_CLUSTER = process.env.APP_CLUSTER || APP_CLUSTER_DEFAULT
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const port = process.env.PORT || 3000
@@ -25,11 +35,6 @@ app.use(express.urlencoded())
 app.use(express.static("public", {
     index: false
 }))
-
-const APP_ID = process.env.APP_ID
-const APP_KEY = process.env.APP_KEY
-const APP_SECRET = process.env.APP_SECRET
-const APP_CLUSTER = process.env.APP_CLUSTER
 
 const pusher = new Pusher({
     appId: APP_ID,
@@ -87,6 +92,6 @@ app.post("/pusher/user-auth", (req, res) => {
     res.send(userAuth)
 })
 
-// app.listen(port, () => console.log(`Squash server running on port ${port}`))
+app.listen(port, () => console.log(`Squash server running on port ${port}`))
 
 export default app

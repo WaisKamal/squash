@@ -19,7 +19,7 @@ const channelAuthEndpoint = "/pusher/auth"
 const playerDataEndpoint = "/api/player"
 
 // App key
-const APP_KEY = "a3fff4c418b83c2b12db"
+const APP_KEY = config.appKey
 
 const pusher = new Pusher(APP_KEY, {
   userAuthentication: {
