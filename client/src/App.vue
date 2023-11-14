@@ -13,12 +13,15 @@ import SeekTable from "./components/SeekTable.vue"
 // Utility functions
 import utils from "./utils/utils"
 
-// Development only
-const userAuthEndpoint = "http://localhost:3000/pusher/user-auth"
-const channelAuthEndpoint = "http://localhost:3000/pusher/auth"
-const playerDataEndpoint = "http://localhost:3000/api/player"
+// Endpoints
+const userAuthEndpoint = "/pusher/user-auth"
+const channelAuthEndpoint = "/pusher/auth"
+const playerDataEndpoint = "/api/player"
 
-const pusher = new Pusher("7ac779fdc52b29158df6", {
+// App key
+const APP_KEY = "7ac779fdc52b29158df6"
+
+const pusher = new Pusher(APP_KEY, {
   userAuthentication: {
     endpoint: userAuthEndpoint,
   },
