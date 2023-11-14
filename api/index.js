@@ -44,7 +44,7 @@ const pusher = new Pusher({
     forceTLS: true,
 });
 
-app.get("/play", (req, res) => {
+app.get("/", (req, res) => {
     req.session.playerId = "player-" + utils.generateGameId()
     res.sendFile(__dirname + "/public/index.html")
 })
