@@ -36,7 +36,7 @@ const pusher = new Pusher({
 
 app.get("/play", (req, res) => {
     req.session.playerId = "player-" + utils.generateGameId()
-    res.sendFile(__dirname + "/public/index.html")
+    res.send(__dirname + "/public/index.html")
 })
 
 app.get("/api/player", (req, res) => {
