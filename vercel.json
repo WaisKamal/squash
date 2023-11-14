@@ -4,9 +4,5 @@
         { "source": "/pusher/auth", "destination": "/api/public" },
         { "source": "/pusher/user-auth", "destination": "/api/public" },
         { "source": "/play", "destination": "/api/public" }
-    ],
-    "redirects": [
-        { "source": "/assets/:path", "destination": "/public/assets/:path" },
-        { "source": "/", "destination": "/play" }
     ]
 }
