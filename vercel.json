@@ -6,7 +6,6 @@
         { "source": "/play", "destination": "/api" }
     ],
     "redirects": [
-        { "source": "/assets/:path", "destination": "/public/assets/:path" },
-        { "source": "/", "destination": "/play"}
+        { "source": "/assets/:path", "destination": "/public/assets/:path" }
     ]
 }
