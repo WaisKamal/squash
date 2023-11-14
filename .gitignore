@@ -28,6 +28,3 @@ Design.pptx
 *.njsproj
 *.sln
 *.sw?
-
-# Output directory
-/api/public
