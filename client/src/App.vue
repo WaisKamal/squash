@@ -137,29 +137,15 @@ async function dashButtonClicked(boardSize) {
     game.status = "nogame"
     gameChannel.trigger("client-game-left", {})
     pusher.unsubscribe(gameChannel.name)
-  } else if (game.status == "seek" || game.status == "join") {
+  } else if (game.status == "seek") {
+    game.status = "nogame"
+    pusher.unsubscribe(gameChannel.name)
+  } else if (game.status == "join") {
     game.status = "nogame"
   } else if (game.status == "nogame") {
     if (game.gameMode == "1v1-new") {
-      // const channelId = await fetch("http://localhost:3000/seek/new", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json"
-      //   },
-      //   body: JSON.stringify({
-      //     playerId: playerId,
-      //     boardDimensions: boardSize
-      //   })
-      // }).then(res => res.json())
       game.gameId = utils.generateRandomString(8)
       const channelId = "presence-" + game.gameId
-      const channelData = {
-        channel_name: channelId,
-        user_id: playerId,
-        user_info: {
-          name: "Player " + playerId.split("-").pop()
-        }
-      }
       gameChannel = pusher.subscribe(channelId)
       gameChannel.bind("pusher:subscription_succeeded", () => {
         console.log("Subscribed to channel", gameChannel)
