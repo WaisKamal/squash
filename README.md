@@ -6,7 +6,7 @@ Squash is a multiplayer board game where players solve a numbers riddle by utili
 
 ## Requirements
 
- - Node.js version 16.0 or later
+ - Node.js version 16.0 or later (for running locally)
  - Web browser:
    - Chrome version 80.0 or above
    - Firefox version 68 or above
