@@ -60,10 +60,7 @@ function getButtonText() {
       @joinButtonClicked="joinButtonClicked"
       v-show="gameStatus == 'join'" />
     <DashGameStatus
-      :playerName="playerData.playerName"
-      :playerProgress="playerData.playerProgress"
-      :opponentName="playerData.opponentName"
-      :opponentProgress="playerData.opponentProgress"
+      v-bind="playerData"
       v-if="gameStatus == 'playing'" />
     <button id="btn-play" @click="seekButtonClicked">{{ getButtonText() }}</button>
   </div>

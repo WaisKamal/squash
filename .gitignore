@@ -28,3 +28,6 @@ Design.pptx
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variable store (with app keys)
+api/.env

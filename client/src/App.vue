@@ -65,6 +65,9 @@ let game = reactive({
     cellsAffirmed: 0,
     cellsCrossed: 0
   },
+  playerIsConnected: true,
+  opponentIsConnected: true,
+  opponentId: undefined,
   opponentProgress: {
     cellsAffirmed: 0,
     cellsCrossed: 0
@@ -75,6 +78,7 @@ let game = reactive({
 let playerData = computed(() => {
   return {
     playerName: "Player",
+    playerIsConnected: game.playerIsConnected,
     playerProgress: {
       filledCells: {
         marked: game.boardState.cellsAffirmed,
@@ -86,6 +90,7 @@ let playerData = computed(() => {
       }
     },
     opponentName: "Opponent",
+    opponentIsConnected: game.opponentIsConnected,
     opponentProgress: {
       filledCells: {
         marked: game.opponentProgress.cellsAffirmed,
@@ -129,11 +134,13 @@ function startGame(boardConfig) {
   game.boardState.data = game.boardData.map(row => row.map(cell => 0))
   game.boardState.styleData = game.boardData.map(row => row.map(cell => 0))
   game.boardState.cellsAffirmed = game.boardState.cellsCrossed = 0
+  game.opponentProgress.cellsAffirmed = game.opponentProgress.cellsCrossed = 0
   game.status = "playing"
 }
 
 async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
+    game.opponentId = ""
     game.status = "nogame"
     gameChannel.trigger("client-game-left", {})
     pusher.unsubscribe(gameChannel.name)
@@ -150,11 +157,27 @@ async function dashButtonClicked(boardSize) {
       gameChannel.bind("pusher:subscription_succeeded", () => {
         console.log("Subscribed to channel", gameChannel)
       })
-      gameChannel.bind("pusher:member_added", () => {
-        const boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
-        // Send board configuration to the other player
-        gameChannel.trigger("client-board-config", boardConfig)
-        startGame(boardConfig)
+      gameChannel.bind("pusher:member_added", member => {
+        // Assign opponent as first player that joins
+        if (!game.opponentId) {
+          game.opponentId = member.id
+          const boardConfig = utils.generateBoard(boardSize.rows, boardSize.columns)
+          // Send board configuration to the other player
+          gameChannel.trigger("client-game-data", {
+            opponentId: playerId,
+            boardConfig: boardConfig
+          })
+          startGame(boardConfig)
+        } else {
+          if (member.id == game.opponentId) {
+            game.opponentIsConnected = true
+          }
+        }
+      })
+      gameChannel.bind("pusher:member_removed", member => {
+        if (member.id == game.opponentId) {
+          game.opponentIsConnected = false
+        }
       })
       gameChannel.bind("client-progress-updated", data => {
         game.opponentProgress.cellsAffirmed = data.cellsAffirmed
@@ -181,14 +204,27 @@ function joinButtonClicked(gameUrl) {
   gameChannel.bind("pusher:subscription_succeeded", () => {
     console.log("Subscribed to channel", gameChannel)
   })
-  gameChannel.bind("client-board-config", data => {
-    startGame(data)
+  gameChannel.bind("pusher:member_added", member => {
+    if (member.id == game.opponentId) {
+      game.opponentIsConnected = true
+    }
+  })
+  gameChannel.bind("pusher:member_removed", member => {
+    if (member.id == game.opponentId) {
+      game.opponentIsConnected = false
+    }
+  })
+  gameChannel.bind("client-game-data", data => {
+    game.opponentId = data.opponentId
+    console.log("Opponent ID:", game.opponentId)
+    startGame(data.boardConfig)
   })
   gameChannel.bind("client-progress-updated", data => {
     game.opponentProgress.cellsAffirmed = data.cellsAffirmed
     game.opponentProgress.cellsCrossed = data.cellsCrossed
   })
   gameChannel.bind("client-game-left", () => {
+    game.opponentId = ""
     game.status = "nogame"
     pusher.unsubscribe(gameChannel.name)
   })

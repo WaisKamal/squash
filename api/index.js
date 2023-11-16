@@ -5,14 +5,15 @@ import cors from 'cors'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import utils from './_utils.js';
-import config from "./config.json" assert { type: "json" };
+import dotenv from 'dotenv';
 
-console.log(config)
+// Load environment variables
+dotenv.config()
 
-const APP_ID = process.env.APP_ID || config.APP_ID_DEFAULT
-const APP_KEY = process.env.APP_KEY || config.APP_KEY_DEFAULT
-const APP_SECRET = process.env.APP_SECRET || config.APP_SECRET_DEFAULT
-const APP_CLUSTER = process.env.APP_CLUSTER || config.APP_CLUSTER_DEFAULT
+const APP_ID = process.env.APP_ID
+const APP_KEY = process.env.APP_KEY
+const APP_SECRET = process.env.APP_SECRET
+const APP_CLUSTER = process.env.APP_CLUSTER
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,7 +44,9 @@ const pusher = new Pusher({
 });
 
 app.get("/play", (req, res) => {
-    req.session.playerId = "player-" + utils.generateGameId()
+    if (!req.session.playerId) {
+        req.session.playerId = "player-" + utils.generateGameId()
+    }
     res.sendFile(__dirname + "/public/index.html")
 })
 
