@@ -19,12 +19,14 @@ Squash is a multiplayer board game where players solve a numbers riddle by utili
 
   2. When your Pusher app is ready, go to your app's dashboard and select "App Keys" on the left. You will need to configure the client and server with these keys.
 
-     In the `api` folder, open `index.js` in your preferred editor and update the default app keys near the top of the file.
+     In the `api` folder, create a `.env` file and add the following environment variables. Replace the key values with your app keys.
 
-         const APP_ID_DEFAULT = "your_app_id_here"
-         const APP_KEY_DEFAULT = "your_app_key_here"
-         const APP_SECRET_DEFAULT = "your_app_secret_here"
-         const APP_CLUSTER_DEFAULT = "your_app_cluster_here"
+         APP_ID = "YOUR_APP_ID_HERE"
+         APP_KEY = "YOUR_APP_KEY_HERE"
+         APP_SECRET = "YOUR_APP_SECRET_HERE"
+         APP_CLUSTER = "YOUR_APP_CLUSTER_HERE"
+
+     Alternatively, you could add the above keys to your system's environment variables.
 
      In the `client/src` folder, open `config.json` in your preferred editor and update the `appKey` entry.
 
@@ -54,7 +56,7 @@ Squash is a multiplayer board game where players solve a numbers riddle by utili
 
 Everything in this repository is open to change, so feel free to contribute any new ideas or enhancements!
 
-To contribute to Squash!, clone this repository and open the source code in your favorite IDE (VS Code is recommended).
+To contribute to Squash!, clone this repository and open the source code in your favorite IDE. The recommended IDE setup is VS Code + Volar extension.
 
 ## Licenses
 
