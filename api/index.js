@@ -5,16 +5,14 @@ import cors from 'cors'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import utils from './_utils.js';
+import config from "./config.json" assert { type: "json" };
 
-const APP_ID_DEFAULT = "your_app_id_here"
-const APP_KEY_DEFAULT = "your_app_key_here"
-const APP_SECRET_DEFAULT = "your_app_secret_here"
-const APP_CLUSTER_DEFAULT = "your_app_cluster_here"
+console.log(config)
 
-const APP_ID = process.env.APP_ID || APP_ID_DEFAULT
-const APP_KEY = process.env.APP_KEY || APP_KEY_DEFAULT
-const APP_SECRET = process.env.APP_SECRET || APP_SECRET_DEFAULT
-const APP_CLUSTER = process.env.APP_CLUSTER || APP_CLUSTER_DEFAULT
+const APP_ID = process.env.APP_ID || config.APP_ID_DEFAULT
+const APP_KEY = process.env.APP_KEY || config.APP_KEY_DEFAULT
+const APP_SECRET = process.env.APP_SECRET || config.APP_SECRET_DEFAULT
+const APP_CLUSTER = process.env.APP_CLUSTER || config.APP_CLUSTER_DEFAULT
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,7 +86,6 @@ app.post("/pusher/user-auth", (req, res) => {
         watchlist: []
     };
     const userAuth = pusher.authenticateUser(socket_id, user)
-    console.log(userAuth)
     res.send(userAuth)
 })
 
