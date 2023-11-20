@@ -41,7 +41,7 @@ Squash is a multiplayer board game where players solve a numbers riddle by utili
          npm install
          npm run build
 
-  4. cd into the `server` directory and install the required dependencies.
+  4. cd into the `api` directory and install the required dependencies.
 
          cd ../api
          npm install
