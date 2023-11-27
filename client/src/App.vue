@@ -269,10 +269,12 @@ function cellReleased() {
       }, index++ * 100)
     }
   })
-  setTimeout(() => gameChannel.trigger("client-progress-updated", {
-    cellsAffirmed: game.boardState.cellsAffirmed,
-    cellsCrossed: game.boardState.cellsCrossed
-  }), 0)
+  if (game.gameMode == "1v1-new" || game.gameMode == "1v1-join") {
+    setTimeout(() => gameChannel.trigger("client-progress-updated", {
+      cellsAffirmed: game.boardState.cellsAffirmed,
+      cellsCrossed: game.boardState.cellsCrossed
+    }), 0)
+  }
   // Clear selected cells
   game.boardState.selectedCells = []
 }

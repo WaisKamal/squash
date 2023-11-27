@@ -8,25 +8,32 @@ function joinGame() {
     emit("joinButtonClicked", gameUrl)
 }
 
-const emit = defineEmits(["joinButtonClicked"])
+const emit = defineEmits(["joinButtonClicked", "dashButtonClicked"])
+
+function dashButtonClicked() {
+  emit("dashButtonClicked")
+}
 </script>
 
 <template>
   <div class="join-dash">
-    <h3>Join a game</h3>
-    <p>Enter the URL of a game to join</p>
-    <div class="url-container">
-      <input type="text" class="url-field" ref="urlField" />
-      <button ref="btnJoin" @click="joinGame">Join</button>
+    <div class="dash-content">
+      <h3>Join a game</h3>
+      <p>Enter the URL of a game to join</p>
+      <div class="url-container">
+        <input type="text" class="url-field" ref="urlField" />
+        <button ref="btnJoin" @click="joinGame">Join</button>
+      </div>
     </div>
+    <button class="squash-button" @click="dashButtonClicked">Cancel</button>
   </div>
 </template>
 
 <style scoped>
-.join-dash {
+.join-dash .dash-content {
   height: 360px;
-
 }
+
 .join-dash h3 {
   font-family: "Arial Rounded";
   font-size: 32px;
@@ -60,7 +67,6 @@ const emit = defineEmits(["joinButtonClicked"])
 .join-dash .url-container .url-field:focus {
     outline: 2px solid var(--color-primary);
 }
-
 
 .join-dash .url-container button {
   margin-left: 10px;

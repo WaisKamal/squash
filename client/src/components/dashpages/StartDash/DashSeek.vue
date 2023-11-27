@@ -9,7 +9,7 @@ const props = defineProps({
   seekOptions: Object
 })
 
-const emit = defineEmits(["boardSizeChanged", "gameModeChanged"])
+const emit = defineEmits(["boardSizeChanged", "gameModeChanged", "dashButtonClicked"])
 
 // Utility function to select board size
 function selectBoardSize(columns, rows) {
@@ -30,35 +30,43 @@ function isBoardSizeSelected(columns, rows) {
 function isGameModeSelected(mode) {
   return props.seekOptions.gameMode == mode
 }
+
+function dashButtonClicked() {
+  emit("dashButtonClicked")
+}
 </script>
 
 <template>
   <div class="seek">
-    <h3>Board size</h3>
-    <div class="board-size-options">
-      <BoardSizeOption
-        v-for="option in config.boardSizeOptions"
-        :class="isBoardSizeSelected(option.columns, option.rows) ? 'selected' : ''"
-        @click="selectBoardSize(option.columns, option.rows)">
-        {{ `${option.columns}x${option.rows}` }}
-      </BoardSizeOption>
+    <div class="dash-content">
+      <h3>Board size</h3>
+      <div class="board-size-options">
+        <BoardSizeOption
+          v-for="option in config.boardSizeOptions"
+          :class="isBoardSizeSelected(option.columns, option.rows) ? 'selected' : ''"
+          @click="selectBoardSize(option.columns, option.rows)">
+          {{ `${option.columns}x${option.rows}` }}
+        </BoardSizeOption>
+      </div>
+      <h3>Game mode</h3>
+      <div class="game-mode-options">
+        <GameModeOption
+          v-for="option in config.gameModeOptions"
+          :class="isGameModeSelected(option.value) ? 'selected' : ''"
+          :label="option.label"
+          :iconName="option.value"
+          @click="selectGameMode(option.value)" />
+      </div>
     </div>
-    <h3>Game mode</h3>
-    <div class="game-mode-options">
-      <GameModeOption
-        v-for="option in config.gameModeOptions"
-        :class="isGameModeSelected(option.value) ? 'selected' : ''"
-        :label="option.label"
-        :iconName="option.value"
-        @click="selectGameMode(option.value)" />
-    </div>
+    <button class="squash-button" @click="dashButtonClicked">Play</button>
   </div>
 </template>
 
 <style scoped>
-  .seek {
+  .seek .dash-content {
     height: 360px;
   }
+  
   .seek h3 {
     font-family: "Arial Rounded";
     font-size: 32px;

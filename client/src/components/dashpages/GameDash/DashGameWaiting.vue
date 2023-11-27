@@ -4,6 +4,8 @@ let props = defineProps({
   gameUrl: String
 })
 
+const emit = defineEmits(["dashButtonClicked"])
+
 let urlField = ref()
 let btnCopy = ref()
 
@@ -16,24 +18,31 @@ async function selectUrlAndCopy() {
     console.error('Failed to copy: ', err)
   }
 }
+
+function dashButtonClicked() {
+  emit("dashButtonClicked")
+}
 </script>
 
 <template>
   <div class="wait-dash">
-    <h3>Waiting for opponent</h3>
-    <p>The game will start when someone joins using this invite link</p>
-    <div class="url-container">
-      <div class="url-field" ref="urlField">{{ gameUrl }}</div>
-      <button ref="btnCopy" @click="selectUrlAndCopy">Copy</button>
+    <div class="dash-content">
+      <h3>Waiting for opponent</h3>
+      <p>The game will start when someone joins using this invite link</p>
+      <div class="url-container">
+        <div class="url-field" ref="urlField">{{ gameUrl }}</div>
+        <button ref="btnCopy" @click="selectUrlAndCopy">Copy</button>
+      </div>
     </div>
+    <button class="squash-button" @click="dashButtonClicked">Cancel</button>
   </div>
 </template>
 
 <style scoped>
-.wait-dash {
+.wait-dash .dash-content {
   height: 360px;
-
 }
+
 .wait-dash h3 {
   font-family: "Arial Rounded";
   font-size: 32px;
