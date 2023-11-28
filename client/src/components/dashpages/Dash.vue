@@ -64,7 +64,7 @@ function joinButtonClicked(gameUrl) {
       :gameUrl="gameUrl"
       @joinButtonClicked="joinButtonClicked"
       @dashButtonClicked="dashButtonClicked"
-      v-show="gameStatus == 'join'" />
+      v-if="gameStatus == 'join'" />
     <DashGameStatus
       v-bind="{ ...playerData, gameTime: time.value }"
       @startTimer="onStartTimer"

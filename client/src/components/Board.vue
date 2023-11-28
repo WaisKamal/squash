@@ -115,7 +115,10 @@ function getCellNumber(cellOrder) {
         @mouseover="cellHovered"
         @contextmenu.prevent="" />
     </div>
-    <div class="overlay" v-show="gameStatus == 'gameover'"></div>
+    <div
+      class="overlay" 
+      v-show="gameStatus == 'gameover'"
+      @contextmenu.prevent=""></div>
   </div>
 </template>
 
@@ -134,7 +137,6 @@ function getCellNumber(cellOrder) {
   position: absolute;
   width: 100%;
   height: 100%;
-  /* background: #33333380; */
 }
 
 .board .grid {
