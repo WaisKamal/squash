@@ -189,11 +189,13 @@ async function dashButtonClicked(boardSize) {
       gameChannel.bind("client-opponent-won", data => {
         game.isVictorious = false
         game.status = "gameover"
+        game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
       gameChannel.bind("client-opponent-lost", data => {
         game.isVictorious = true
         game.status = "gameover"
+        game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
       gameChannel.bind("client-game-left", () => {
@@ -239,11 +241,13 @@ function joinButtonClicked(gameUrl) {
   gameChannel.bind("client-opponent-won", data => {
     game.isVictorious = false
     game.status = "gameover"
+    game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
   gameChannel.bind("client-opponent-lost", data => {
     game.isVictorious = true
     game.status = "gameover"
+    game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
   gameChannel.bind("client-game-left", () => {
