@@ -287,12 +287,12 @@ function cellReleased(affirmed) {
         if (game.status != "gameover") {
           game.isVictorious = false
           game.status = "gameover"
-          game.channel.trigger("client-opponent-lost")
+          gameChannel.trigger("client-opponent-lost")
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.status = "gameover"
-          game.channel.trigger("client-opponent-won")
+          gameChannel.trigger("client-opponent-won")
       }
       // Finally modify boardState.styleData
       setTimeout(() => {
