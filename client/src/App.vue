@@ -186,13 +186,13 @@ async function dashButtonClicked(boardSize) {
         game.opponentProgress.cellsAffirmed = data.cellsAffirmed
         game.opponentProgress.cellsCrossed = data.cellsCrossed
       })
-      gameChannel.bind("client-opponent-won", {}, data => {
+      gameChannel.bind("client-opponent-won", data => {
         game.isVictorious = false
         game.status = "gameover"
         game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
-      gameChannel.bind("client-opponent-lost", {}, data => {
+      gameChannel.bind("client-opponent-lost", data => {
         game.isVictorious = true
         game.status = "gameover"
         game.opponentId = ""
@@ -239,13 +239,13 @@ function joinButtonClicked(gameUrl) {
     game.opponentProgress.cellsAffirmed = data.cellsAffirmed
     game.opponentProgress.cellsCrossed = data.cellsCrossed
   })
-  gameChannel.bind("client-opponent-won", {}, data => {
+  gameChannel.bind("client-opponent-won", data => {
     game.isVictorious = false
     game.status = "gameover"
     game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
-  gameChannel.bind("client-opponent-lost", {}, data => {
+  gameChannel.bind("client-opponent-lost", data => {
     game.isVictorious = true
     game.status = "gameover"
     game.opponentId = ""
