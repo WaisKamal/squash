@@ -73,7 +73,8 @@ let game = reactive({
     cellsCrossed: 0
   },
   status: "nogame", // "nogame", "seek", "playing", "gameover"
-  isVictorious: false
+  isVictorious: false,
+  verdict: ""
 })
 
 let playerData = computed(() => {
@@ -188,12 +189,14 @@ async function dashButtonClicked(boardSize) {
       })
       gameChannel.bind("client-opponent-won", data => {
         game.isVictorious = false
+        game.verdict = data.verdict
         game.status = "gameover"
         game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
       gameChannel.bind("client-opponent-lost", data => {
         game.isVictorious = true
+        game.verdict = data.verdict
         game.status = "gameover"
         game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
@@ -241,12 +244,14 @@ function joinButtonClicked(gameUrl) {
   })
   gameChannel.bind("client-opponent-won", data => {
     game.isVictorious = false
+    game.verdict = data.verdict
     game.status = "gameover"
     game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
   gameChannel.bind("client-opponent-lost", data => {
     game.isVictorious = true
+    game.verdict = data.verdict
     game.status = "gameover"
     game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
@@ -292,17 +297,21 @@ function cellReleased(affirmed) {
         game.boardState.cellsCrossed++
       }
       // Then check for win/lose
-      if ((game.boardData[row][column] & 1) != affirmed) {
+      if (game.boardData[row][column] == affirmed) {
         if (game.status != "gameover") {
           game.isVictorious = false
           game.status = "gameover"
-          gameChannel.trigger("client-opponent-lost", {})
+          gameChannel.trigger("client-opponent-lost", {
+            verdict: `Your opponent ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
+          })
           pusher.unsubscribe(gameChannel.name)
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.status = "gameover"
-        gameChannel.trigger("client-opponent-won", {})
+        gameChannel.trigger("client-opponent-won", {
+          verdict: "Your opponent filled all squares"
+        })
         pusher.unsubscribe(gameChannel.name)
       }
       // Finally modify boardState.styleData
@@ -364,6 +373,7 @@ let titleStyle = computed(() => {
       :gameStatus="game.status"
       :playerData="playerData"
       :isVictorious="game.isVictorious"
+      :verdict="game.verdict"
       @boardSizeChanged="setBoardDimensions"
       @gameModeChanged="setGameMode"
       @dashButtonClicked="dashButtonClicked"

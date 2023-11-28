@@ -3,6 +3,7 @@ import { computed, reactive, toRaw } from 'vue';
 
 const props = defineProps({
   isVictorious: Boolean,
+  verdict: String,
   timeTaken: Number,
   cellsFilled: Object,
   cellsCrossed: Object
@@ -72,6 +73,7 @@ console.log(props.isVictorious)
   <div class="game-over-dash">
     <div class="dash-content">
       <h1>{{ isVictorious ? "You win!" : "You lose" }}</h1>
+      <p class="verdict">{{ verdict }}</p>
       <div class="stats">
         <div class="item">
           <h3 class="value">{{ timeTakenText }}</h3>
@@ -97,16 +99,21 @@ console.log(props.isVictorious)
 }
 
 .game-over-dash .dash-content h1 {
-  font-family: "Arial Rounded";
   font-size: 64px;
   text-align: center;
   color: var(--color-primary);
 }
 
+.game-over-dash .dash-content .verdict {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-color);
+}
+
 .game-over-dash .dash-content .stats {
   display: flex;
   gap: 40px;
-  margin-top: 40px;
+  margin-top: 20px;
   flex-wrap: wrap;
   justify-content: center;
 }

@@ -14,6 +14,7 @@ const props = defineProps({
   gameStatus: String,
   playerData: Object,
   isVictorious: Boolean,
+  verdict: String
 })
 
 const emit = defineEmits(["boardSizeChanged", "gameModeChanged", "dashButtonClicked", "joinButtonClicked"])
@@ -80,6 +81,7 @@ function joinButtonClicked(gameUrl) {
         total: playerData.playerProgress.emptyCells.total
       }"
       :isVictorious="isVictorious"
+      :verdict="verdict"
       @dashButtonClicked="dashButtonClicked"
       v-if="gameStatus == 'gameover'" />
   </div>
