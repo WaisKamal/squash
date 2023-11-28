@@ -310,7 +310,7 @@ function cellReleased(affirmed) {
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
-        game.verdict = `You ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
+        game.verdict = `You filled all squares!`
         game.opponentId = ""
         game.status = "gameover"
         gameChannel.trigger("client-opponent-won", {
