@@ -189,10 +189,12 @@ async function dashButtonClicked(boardSize) {
       gameChannel.bind("client-opponent-won", data => {
         game.isVictorious = false
         game.status = "gameover"
+        pusher.unsubscribe(gameChannel.name)
       })
       gameChannel.bind("client-opponent-lost", data => {
         game.isVictorious = true
         game.status = "gameover"
+        pusher.unsubscribe(gameChannel.name)
       })
       gameChannel.bind("client-game-left", () => {
         game.status = "nogame"
@@ -237,10 +239,12 @@ function joinButtonClicked(gameUrl) {
   gameChannel.bind("client-opponent-won", data => {
     game.isVictorious = false
     game.status = "gameover"
+    pusher.unsubscribe(gameChannel.name)
   })
   gameChannel.bind("client-opponent-lost", data => {
     game.isVictorious = true
     game.status = "gameover"
+    pusher.unsubscribe(gameChannel.name)
   })
   gameChannel.bind("client-game-left", () => {
     game.opponentId = ""
@@ -288,11 +292,13 @@ function cellReleased(affirmed) {
           game.isVictorious = false
           game.status = "gameover"
           gameChannel.trigger("client-opponent-lost", {})
+          pusher.unsubscribe(gameChannel.name)
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.status = "gameover"
-          gameChannel.trigger("client-opponent-won", {})
+        gameChannel.trigger("client-opponent-won", {})
+        pusher.unsubscribe(gameChannel.name)
       }
       // Finally modify boardState.styleData
       setTimeout(() => {
