@@ -4,8 +4,6 @@ import { toRaw } from 'vue';
 const props = defineProps({
   rowHeaders: Array
 })
-
-console.log(toRaw(props.rowHeaders))
 </script>
 
 <template>

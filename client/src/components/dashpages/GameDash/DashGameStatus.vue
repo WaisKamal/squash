@@ -13,34 +13,43 @@ let props = defineProps({
   opponentName: String,          // Similar to playerName
   opponentIsConnected: Boolean,  // Similar to playerIsConnected
   opponentProgress: Object,      // Similar to playerProgress
+  gameTime: Number,              // The game time in second
 })
 
-let time = reactive({
-  value: 0
-})
-setInterval(() => {
-  time.value++
-}, 1000)
+const emit = defineEmits(["startTimer", "stopTimer", "dashButtonClicked",])
+
+// Start timer when game status dash is mounted
+emit("startTimer")
+
+function dashButtonClicked() {
+  emit("dashButtonClicked")
+}
 </script>
 
 <template>
   <div class="game-status">
-    <Clock :time="time.value" />
-    <GameProgress :playerName="props.playerName" :progress="props.playerProgress"/>
-    <GameProgress :playerName="props.opponentName" :progress="props.opponentProgress"/>
-    <div
-      class="notification"
-      v-show="!playerIsConnected || !opponentIsConnected">
-      {{ !playerIsConnected ? 'You' : 'Your opponent' }} went offline. Game forfiets in 00:30
+    <div class="dash-content">
+      <Clock :time="gameTime" />
+      <GameProgress :playerName="props.playerName" :progress="props.playerProgress"/>
+      <GameProgress :playerName="props.opponentName" :progress="props.opponentProgress"/>
+      <div
+        class="notification"
+        v-show="!playerIsConnected || !opponentIsConnected">
+        {{ !playerIsConnected ? 'You' : 'Your opponent' }} went offline. Game forfiets in 00:30
+      </div>
     </div>
+    <button class="squash-button" @click="dashButtonClicked">Quit game</button>
   </div>
 </template>
 
 <style scoped>
 .game-status {
+}
+
+.game-status .dash-content {
   display: flex;
-  flex-direction: column;
   height: 360px;
+  flex-direction: column;
   align-items: center;
 }
 

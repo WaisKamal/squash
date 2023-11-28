@@ -72,7 +72,9 @@ let game = reactive({
     cellsAffirmed: 0,
     cellsCrossed: 0
   },
-  status: "nogame" // "nogame", "seek", "playing", "gameover"
+  status: "nogame", // "nogame", "seek", "playing", "gameover"
+  isVictorious: false,
+  verdict: ""
 })
 
 let playerData = computed(() => {
@@ -142,12 +144,14 @@ async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
     game.opponentId = ""
     game.status = "nogame"
-    gameChannel.trigger("client-game-left", {})
+    gameChannel.trigger("client-game-left")
     pusher.unsubscribe(gameChannel.name)
   } else if (game.status == "seek") {
     game.status = "nogame"
     pusher.unsubscribe(gameChannel.name)
   } else if (game.status == "join") {
+    game.status = "nogame"
+  } else if (game.status == "gameover") {
     game.status = "nogame"
   } else if (game.status == "nogame") {
     if (game.gameMode == "1v1-new") {
@@ -183,8 +187,23 @@ async function dashButtonClicked(boardSize) {
         game.opponentProgress.cellsAffirmed = data.cellsAffirmed
         game.opponentProgress.cellsCrossed = data.cellsCrossed
       })
+      gameChannel.bind("client-opponent-won", data => {
+        game.isVictorious = false
+        game.verdict = data.verdict
+        game.status = "gameover"
+        game.opponentId = ""
+        pusher.unsubscribe(gameChannel.name)
+      })
+      gameChannel.bind("client-opponent-lost", data => {
+        game.isVictorious = true
+        game.verdict = data.verdict
+        game.status = "gameover"
+        game.opponentId = ""
+        pusher.unsubscribe(gameChannel.name)
+      })
       gameChannel.bind("client-game-left", () => {
         game.status = "nogame"
+        game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
       game.status = "seek"
@@ -223,9 +242,23 @@ function joinButtonClicked(gameUrl) {
     game.opponentProgress.cellsAffirmed = data.cellsAffirmed
     game.opponentProgress.cellsCrossed = data.cellsCrossed
   })
-  gameChannel.bind("client-game-left", () => {
+  gameChannel.bind("client-opponent-won", data => {
+    game.isVictorious = false
+    game.verdict = data.verdict
+    game.status = "gameover"
     game.opponentId = ""
+    pusher.unsubscribe(gameChannel.name)
+  })
+  gameChannel.bind("client-opponent-lost", data => {
+    game.isVictorious = true
+    game.verdict = data.verdict
+    game.status = "gameover"
+    game.opponentId = ""
+    pusher.unsubscribe(gameChannel.name)
+  })
+  gameChannel.bind("client-game-left", () => {
     game.status = "nogame"
+    game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
 }
@@ -248,7 +281,7 @@ function cellPressed(e) {
   game.boardState.selectedCells.push({ row, column })
 }
 
-function cellReleased() {
+function cellReleased(affirmed) {
   // Apply action first
   // NOTE: does not apply penalties
   let index = 0
@@ -263,16 +296,40 @@ function cellReleased() {
         game.boardState.data[row][column] = 2
         game.boardState.cellsCrossed++
       }
-      // Then modify boardState.styleData
+      // Then check for win/lose
+      if (game.boardData[row][column] != affirmed) {
+        if (game.status != "gameover") {
+          game.isVictorious = false
+          game.verdict = `You ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
+          game.opponentId = ""
+          game.status = "gameover"
+          gameChannel.trigger("client-opponent-lost", {
+            verdict: `Your opponent ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
+          })
+          pusher.unsubscribe(gameChannel.name)
+        }
+      } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
+        game.isVictorious = true
+        game.verdict = `You filled all squares!`
+        game.opponentId = ""
+        game.status = "gameover"
+        gameChannel.trigger("client-opponent-won", {
+          verdict: "Your opponent filled all squares"
+        })
+        pusher.unsubscribe(gameChannel.name)
+      }
+      // Finally modify boardState.styleData
       setTimeout(() => {
         game.boardState.styleData[row][column] = game.boardData[row][column] ? 1 : 2
       }, index++ * 100)
     }
   })
-  setTimeout(() => gameChannel.trigger("client-progress-updated", {
-    cellsAffirmed: game.boardState.cellsAffirmed,
-    cellsCrossed: game.boardState.cellsCrossed
-  }), 0)
+  if (game.gameMode == "1v1-new" || game.gameMode == "1v1-join") {
+    setTimeout(() => gameChannel.trigger("client-progress-updated", {
+      cellsAffirmed: game.boardState.cellsAffirmed,
+      cellsCrossed: game.boardState.cellsCrossed
+    }), 0)
+  }
   // Clear selected cells
   game.boardState.selectedCells = []
 }
@@ -300,11 +357,17 @@ function cellHovered(e) {
     }
   }
 }
+
+let titleStyle = computed(() => {
+  return {
+    fontSize: game.status == 'playing' || game.status == 'gameover' ? '48px' : '64px'
+  }
+})
 </script>
 
 <template>
   <h1 class="title" 
-    :style="{ fontSize: game.status == 'playing' ? '48px' : '64px' }">Squash!</h1>
+    :style="titleStyle">Squash!</h1>
   <div class="content">
     <Dash
       :boardSizeOptions="game.boardSizeOptions"
@@ -313,6 +376,8 @@ function cellHovered(e) {
       :gameUrl="'squash-game.vercel.app/' + game.gameId"
       :gameStatus="game.status"
       :playerData="playerData"
+      :isVictorious="game.isVictorious"
+      :verdict="game.verdict"
       @boardSizeChanged="setBoardDimensions"
       @gameModeChanged="setGameMode"
       @dashButtonClicked="dashButtonClicked"
