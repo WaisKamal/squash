@@ -301,6 +301,7 @@ function cellReleased(affirmed) {
         if (game.status != "gameover") {
           game.isVictorious = false
           game.status = "gameover"
+          game.opponentId = ""
           gameChannel.trigger("client-opponent-lost", {
             verdict: `Your opponent ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
           })
@@ -309,6 +310,7 @@ function cellReleased(affirmed) {
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.status = "gameover"
+        game.opponentId = ""
         gameChannel.trigger("client-opponent-won", {
           verdict: "Your opponent filled all squares"
         })
