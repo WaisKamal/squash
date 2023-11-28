@@ -186,13 +186,13 @@ async function dashButtonClicked(boardSize) {
         game.opponentProgress.cellsAffirmed = data.cellsAffirmed
         game.opponentProgress.cellsCrossed = data.cellsCrossed
       })
-      gameChannel.bind("client-opponent-won", data => {
+      gameChannel.bind("client-opponent-won", {}, data => {
         game.isVictorious = false
         game.status = "gameover"
         game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
-      gameChannel.bind("client-opponent-lost", data => {
+      gameChannel.bind("client-opponent-lost", {}, data => {
         game.isVictorious = true
         game.status = "gameover"
         game.opponentId = ""
@@ -200,6 +200,7 @@ async function dashButtonClicked(boardSize) {
       })
       gameChannel.bind("client-game-left", () => {
         game.status = "nogame"
+        game.opponentId = ""
         pusher.unsubscribe(gameChannel.name)
       })
       game.status = "seek"
@@ -238,21 +239,21 @@ function joinButtonClicked(gameUrl) {
     game.opponentProgress.cellsAffirmed = data.cellsAffirmed
     game.opponentProgress.cellsCrossed = data.cellsCrossed
   })
-  gameChannel.bind("client-opponent-won", data => {
+  gameChannel.bind("client-opponent-won", {}, data => {
     game.isVictorious = false
     game.status = "gameover"
     game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
-  gameChannel.bind("client-opponent-lost", data => {
+  gameChannel.bind("client-opponent-lost", {}, data => {
     game.isVictorious = true
     game.status = "gameover"
     game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
   gameChannel.bind("client-game-left", () => {
-    game.opponentId = ""
     game.status = "nogame"
+    game.opponentId = ""
     pusher.unsubscribe(gameChannel.name)
   })
 }
@@ -295,13 +296,13 @@ function cellReleased(affirmed) {
         if (game.status != "gameover") {
           game.isVictorious = false
           game.status = "gameover"
-          gameChannel.trigger("client-opponent-lost")
+          gameChannel.trigger("client-opponent-lost", {})
           pusher.unsubscribe(gameChannel.name)
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.status = "gameover"
-        gameChannel.trigger("client-opponent-won")
+        gameChannel.trigger("client-opponent-won", {})
         pusher.unsubscribe(gameChannel.name)
       }
       // Finally modify boardState.styleData
