@@ -72,7 +72,8 @@ let game = reactive({
     cellsAffirmed: 0,
     cellsCrossed: 0
   },
-  status: "nogame" // "nogame", "seek", "playing", "gameover"
+  status: "nogame", // "nogame", "seek", "playing", "gameover"
+  isVictorious: false
 })
 
 let playerData = computed(() => {
@@ -149,6 +150,8 @@ async function dashButtonClicked(boardSize) {
     pusher.unsubscribe(gameChannel.name)
   } else if (game.status == "join") {
     game.status = "nogame"
+  } else if (game.status == "gameover") {
+    game.status = "nogame"
   } else if (game.status == "nogame") {
     if (game.gameMode == "1v1-new") {
       game.gameId = utils.generateRandomString(8)
@@ -182,6 +185,14 @@ async function dashButtonClicked(boardSize) {
       gameChannel.bind("client-progress-updated", data => {
         game.opponentProgress.cellsAffirmed = data.cellsAffirmed
         game.opponentProgress.cellsCrossed = data.cellsCrossed
+      })
+      gameChannel.bind("client-opponent-won", data => {
+        game.isVictorious = false
+        game.status = "gameover"
+      })
+      gameChannel.bind("client-opponent-lost", data => {
+        game.isVictorious = true
+        game.status = "gameover"
       })
       gameChannel.bind("client-game-left", () => {
         game.status = "nogame"
@@ -223,6 +234,14 @@ function joinButtonClicked(gameUrl) {
     game.opponentProgress.cellsAffirmed = data.cellsAffirmed
     game.opponentProgress.cellsCrossed = data.cellsCrossed
   })
+  gameChannel.bind("client-opponent-won", data => {
+    game.isVictorious = false
+    game.status = "gameover"
+  })
+  gameChannel.bind("client-opponent-lost", data => {
+    game.isVictorious = true
+    game.status = "gameover"
+  })
   gameChannel.bind("client-game-left", () => {
     game.opponentId = ""
     game.status = "nogame"
@@ -248,7 +267,7 @@ function cellPressed(e) {
   game.boardState.selectedCells.push({ row, column })
 }
 
-function cellReleased() {
+function cellReleased(affirmed) {
   // Apply action first
   // NOTE: does not apply penalties
   let index = 0
@@ -263,7 +282,19 @@ function cellReleased() {
         game.boardState.data[row][column] = 2
         game.boardState.cellsCrossed++
       }
-      // Then modify boardState.styleData
+      // Then check for win/lose
+      if ((game.boardData[row][column] & 1) != affirmed) {
+        if (game.status != "gameover") {
+          game.isVictorious = false
+          game.status = "gameover"
+          game.channel.trigger("client-opponent-lost")
+        }
+      } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
+        game.isVictorious = true
+        game.status = "gameover"
+          game.channel.trigger("client-opponent-won")
+      }
+      // Finally modify boardState.styleData
       setTimeout(() => {
         game.boardState.styleData[row][column] = game.boardData[row][column] ? 1 : 2
       }, index++ * 100)
@@ -302,11 +333,17 @@ function cellHovered(e) {
     }
   }
 }
+
+let titleStyle = computed(() => {
+  return {
+    fontSize: game.status == 'playing' || game.status == 'gameover' ? '48px' : '64px'
+  }
+})
 </script>
 
 <template>
   <h1 class="title" 
-    :style="{ fontSize: game.status == 'playing' ? '48px' : '64px' }">Squash!</h1>
+    :style="titleStyle">Squash!</h1>
   <div class="content">
     <Dash
       :boardSizeOptions="game.boardSizeOptions"
@@ -315,6 +352,7 @@ function cellHovered(e) {
       :gameUrl="'squash-game.vercel.app/' + game.gameId"
       :gameStatus="game.status"
       :playerData="playerData"
+      :isVictorious="game.isVictorious"
       @boardSizeChanged="setBoardDimensions"
       @gameModeChanged="setGameMode"
       @dashButtonClicked="dashButtonClicked"

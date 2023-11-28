@@ -4,6 +4,7 @@ import DashGameStatus from "./GameDash/DashGameStatus.vue";
 import DashSeek from "./StartDash/DashSeek.vue";
 import DashGameWaiting from "./GameDash/DashGameWaiting.vue";
 import DashGameJoin from "./GameDash/DashGameJoin.vue";
+import DashGameOver from "./GameDash/DashGameOver.vue";
 
 const props = defineProps({
   boardSizeOptions: Object,
@@ -12,9 +13,22 @@ const props = defineProps({
   gameUrl: String,
   gameStatus: String,
   playerData: Object,
+  isVictorious: Boolean,
 })
 
 const emit = defineEmits(["boardSizeChanged", "gameModeChanged", "dashButtonClicked", "joinButtonClicked"])
+
+let time = reactive({
+  value: 0
+})
+let incrementTime = () => time.value++
+let timeInterval = setInterval(incrementTime, 1000)
+
+function onStartTimer() {
+  clearInterval(timeInterval)
+  time.value = 0
+  timeInterval = setInterval(incrementTime, 1000)
+}
 
 function onBoardSizeChanged(boardSize) {
   emit("boardSizeChanged", boardSize)
@@ -51,9 +65,23 @@ function joinButtonClicked(gameUrl) {
       @dashButtonClicked="dashButtonClicked"
       v-show="gameStatus == 'join'" />
     <DashGameStatus
-      v-bind="playerData"
+      v-bind="{ ...playerData, gameTime: time.value }"
+      @startTimer="onStartTimer"
       @dashButtonClicked="dashButtonClicked"
       v-if="gameStatus == 'playing'" />
+    <DashGameOver
+      :timeTaken="time.value"
+      :cellsFilled="{
+        filled: playerData.playerProgress.filledCells.marked,
+        total: playerData.playerProgress.filledCells.total
+      }"
+      :cellsCrossed="{
+        crossed: playerData.playerProgress.emptyCells.marked,
+        total: playerData.playerProgress.emptyCells.total
+      }"
+      :isVictorious="isVictorious"
+      @dashButtonClicked="dashButtonClicked"
+      v-if="gameStatus == 'gameover'" />
   </div>
 </template>
 

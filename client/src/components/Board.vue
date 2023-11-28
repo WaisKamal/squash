@@ -42,8 +42,8 @@ function cellPressed(e) {
   emit("cellPressed", e)
 }
 
-function cellReleased() {
-  emit("cellReleased")
+function cellReleased(e) {
+  emit("cellReleased", e.button == 0)
 }
 
 function cellHovered(e) {
@@ -90,7 +90,7 @@ function getCellNumber(cellOrder) {
 </script>
 
 <template>
-  <div class="board" v-if="data.gameStatus == 'playing'">
+  <div class="board" v-if="gameStatus == 'playing' || gameStatus == 'gameover'">
     <div></div>
     <ColumnHeaders :columnHeaders="columnHeaders" />
     <RowHeaders :rowHeaders="rowHeaders" />
@@ -115,17 +115,26 @@ function getCellNumber(cellOrder) {
         @mouseover="cellHovered"
         @contextmenu.prevent="" />
     </div>
+    <div class="overlay" v-show="gameStatus == 'gameover'"></div>
   </div>
 </template>
 
 <style scoped>
 .board {
+  position: relative;
   display: grid;
   grid-template-rows: min-content min-content;
   grid-template-columns: min-content min-content;
   grid-gap: 1px;
   border-radius: 50px 0px 0px 0px;
   user-select: none;
+}
+
+.board .overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* background: #33333380; */
 }
 
 .board .grid {

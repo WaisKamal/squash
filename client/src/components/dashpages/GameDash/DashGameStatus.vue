@@ -13,16 +13,13 @@ let props = defineProps({
   opponentName: String,          // Similar to playerName
   opponentIsConnected: Boolean,  // Similar to playerIsConnected
   opponentProgress: Object,      // Similar to playerProgress
+  gameTime: Number,              // The game time in second
 })
 
-const emit = defineEmits(["dashButtonClicked"])
+const emit = defineEmits(["startTimer", "stopTimer", "dashButtonClicked",])
 
-let time = reactive({
-  value: 0
-})
-setInterval(() => {
-  time.value++
-}, 1000)
+// Start timer when game status dash is mounted
+emit("startTimer")
 
 function dashButtonClicked() {
   emit("dashButtonClicked")
@@ -32,7 +29,7 @@ function dashButtonClicked() {
 <template>
   <div class="game-status">
     <div class="dash-content">
-      <Clock :time="time.value" />
+      <Clock :time="gameTime" />
       <GameProgress :playerName="props.playerName" :progress="props.playerProgress"/>
       <GameProgress :playerName="props.opponentName" :progress="props.opponentProgress"/>
       <div
