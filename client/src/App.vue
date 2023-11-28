@@ -143,7 +143,7 @@ async function dashButtonClicked(boardSize) {
   if (game.status == "playing") {
     game.opponentId = ""
     game.status = "nogame"
-    gameChannel.trigger("client-game-left", {})
+    gameChannel.trigger("client-game-left")
     pusher.unsubscribe(gameChannel.name)
   } else if (game.status == "seek") {
     game.status = "nogame"
@@ -295,13 +295,13 @@ function cellReleased(affirmed) {
         if (game.status != "gameover") {
           game.isVictorious = false
           game.status = "gameover"
-          gameChannel.trigger("client-opponent-lost", {})
+          gameChannel.trigger("client-opponent-lost")
           pusher.unsubscribe(gameChannel.name)
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.status = "gameover"
-        gameChannel.trigger("client-opponent-won", {})
+        gameChannel.trigger("client-opponent-won")
         pusher.unsubscribe(gameChannel.name)
       }
       // Finally modify boardState.styleData
