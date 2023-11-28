@@ -297,7 +297,7 @@ function cellReleased(affirmed) {
         game.boardState.cellsCrossed++
       }
       // Then check for win/lose
-      if (game.boardData[row][column] == affirmed) {
+      if (game.boardData[row][column] != affirmed) {
         if (game.status != "gameover") {
           game.isVictorious = false
           game.verdict = `You ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
