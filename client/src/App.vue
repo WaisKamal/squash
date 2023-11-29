@@ -393,7 +393,7 @@ let titleStyle = computed(() => {
       @cellReleased="cellReleased"
       @cellHovered="cellHovered"
       @mouseLeftBoardGrid="mouseLeftBoardGrid" />
-    <SeekTable :gameStatus="game.status" :seekRequests="[]" />
+    <SeekTable :gameStatus="game.status" />
   </div>
 </template>
 
