@@ -1,5 +1,6 @@
 <script setup>
-import { computed, reactive, toRaw } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import confetti from "canvas-confetti"
 
 const props = defineProps({
   isVictorious: Boolean,
@@ -9,9 +10,23 @@ const props = defineProps({
   cellsCrossed: Object
 })
 
-console.log(props.timeTaken)
-
 const emit = defineEmits(["dashButtonClicked"])
+
+const confettiCanvas = ref()
+const startConfetti = confetti.create(confettiCanvas.value, { resize: true })
+const confettiOptions = {
+  particleCount: 300,
+  spread: 150,
+  startVelocity: 30,
+  gravity: 1
+}
+if (props.isVictorious) {
+  setTimeout(() => {
+    startConfetti({...confettiOptions, origin: { x: 0.25 }})
+    startConfetti({...confettiOptions, origin: { x: 0.5 }})
+    startConfetti({...confettiOptions, origin: { x: 0.75 }})
+  }, 250)
+}
 
 let statsValues = reactive({
   timeTaken: 0,
@@ -26,7 +41,6 @@ let timeTakenIncrement = Math.floor(
     )
   )
 )
-console.log(timeTakenIncrement)
 const timeTakenInt = setInterval(() => {
   if (statsValues.timeTaken >= props.timeTaken) {
     clearInterval(timeTakenInt)
@@ -65,8 +79,6 @@ const cellsCrossedText = computed(() => {
 function dashButtonClicked() {
   emit("dashButtonClicked")
 }
-
-console.log(props.isVictorious)
 </script>
 
 <template>
@@ -90,10 +102,17 @@ console.log(props.isVictorious)
       </div>
     </div>
     <button class="squash-button" @click="dashButtonClicked">Play again</button>
+    <div class="canvas-holder">
+      <canvas ref="confettiCanvas"></canvas>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.game-over-dash {
+  position: relative;
+}
+
 .game-over-dash .dash-content {
   height: 360px;
 }
@@ -118,8 +137,7 @@ console.log(props.isVictorious)
   justify-content: center;
 }
 
-.game-over-dash .dash-content .stats .item {
-}
+.game-over-dash .dash-content .stats .item {}
 
 .game-over-dash .stats .item .value {
   font-size: 36px;
@@ -131,5 +149,19 @@ console.log(props.isVictorious)
   font-size: 16px;
   text-align: center;
   color: var(--text-color);
+}
+
+.game-over-dash .canvas-holder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.game-over-dash .canvas-holder canvas {
+  width: 100%;
+  height: 100%;
 }
 </style>

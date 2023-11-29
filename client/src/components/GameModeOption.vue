@@ -8,7 +8,7 @@ let props = defineProps({
 <template>
   <div class="option">
     <div class="icon">
-      <img :src="`/src/assets/img/${iconName}.png`" />
+      <img :src="`/img/icons/${iconName}.png`" />
     </div>
     <p class="label">{{ label }}</p>
   </div>
