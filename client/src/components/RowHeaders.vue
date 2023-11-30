@@ -1,18 +1,60 @@
 <script setup>
-import { toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
 
 const props = defineProps({
-  rowHeaders: Array
+  rowHeaders: Array,
+  boardState: Array
+})
+
+const headerCrossedState = computed(() => {
+  let crossedState = props.rowHeaders.map(row => row.map(item => false))
+  for (var r = 0; r < crossedState.length; r++) {
+    let currentCount = 0
+    let currentItemIndex = 0
+    // Cross out items from the top of the column
+    for (var c = 0; c < props.boardState[0].length; c++) {
+      if (props.boardState[r][c] == 1) {
+        currentCount++
+        if (currentCount == props.rowHeaders[r][currentItemIndex]) {
+          crossedState[r][currentItemIndex] = true
+          currentItemIndex++
+          currentCount = 0
+        }
+      } else if (props.boardState[r][c] == 2) {
+        currentCount = 0
+      } else {
+        break
+      }
+    }
+    // Cross out items from the bottom of the column
+    currentCount = 0
+    currentItemIndex = props.rowHeaders[r].length - 1
+    for (var c = props.boardState[0].length - 1; c >= 0; c--) {
+      if (props.boardState[r][c] == 1) {
+        currentCount++
+        if (currentCount == props.rowHeaders[r][currentItemIndex]) {
+          crossedState[r][currentItemIndex] = true
+          currentItemIndex--
+          currentCount = 0
+        }
+      } else if (props.boardState[r][c] == 2) {
+        currentCount = 0
+      } else {
+        break
+      }
+    }
+  }
+  return crossedState
 })
 </script>
 
 <template>
   <div class="row-headers">
-    <div class="header" v-for="header in rowHeaders.headers">
+    <div class="header" v-for="(header, headerIndex) in rowHeaders">
       <div
         class="item"
-        :class="{ 'crossed': false }"
-        v-for="(item, index) in header">{{ item }}</div>
+        :class="{ 'crossed': headerCrossedState[headerIndex][itemIndex] }"
+        v-for="(item, itemIndex) in header">{{ item }}</div>
     </div>
   </div>
 </template>

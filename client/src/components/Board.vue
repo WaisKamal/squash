@@ -92,8 +92,8 @@ function getCellNumber(cellOrder) {
 <template>
   <div class="board" v-if="gameStatus == 'playing' || gameStatus == 'gameover'">
     <div></div>
-    <ColumnHeaders :columnHeaders="columnHeaders" />
-    <RowHeaders :rowHeaders="rowHeaders" />
+    <ColumnHeaders :columnHeaders="columnHeaders" :boardState="state.styleData" />
+    <RowHeaders :rowHeaders="rowHeaders" :boardState="state.styleData" />
     <div class="grid" :style="boardStyle"
       @mouseleave="mouseLeftBoardGrid"
       @contextmenu.prevent="">

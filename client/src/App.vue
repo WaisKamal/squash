@@ -108,8 +108,8 @@ let playerData = computed(() => {
 
 // Generate board
 let boardConfig = utils.generateBoard(game.boardDimensions.rows, game.boardDimensions.columns)
-game.rowHeaders.headers = boardConfig.rowHeaders
-game.columnHeaders.headers = boardConfig.columnHeaders
+game.rowHeaders = boardConfig.rowHeaders
+game.columnHeaders = boardConfig.columnHeaders
 game.filledCellsCount = boardConfig.filledCellsCount
 game.emptyCellsCount = boardConfig.emptyCellsCount
 // Temporary: board data must be in server
@@ -127,8 +127,8 @@ function setGameMode(mode) {
 
 function startGame(boardConfig) {
   game.boardDimensions = { columns: boardConfig.columnHeaders.length, rows: boardConfig.rowHeaders.length }
-  game.rowHeaders.headers = boardConfig.rowHeaders
-  game.columnHeaders.headers = boardConfig.columnHeaders
+  game.rowHeaders = boardConfig.rowHeaders
+  game.columnHeaders = boardConfig.columnHeaders
   game.filledCellsCount = boardConfig.filledCellsCount
   game.emptyCellsCount = boardConfig.emptyCellsCount
   // Temporary: board data must be in server

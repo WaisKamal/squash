@@ -1,16 +1,63 @@
 <script setup>
-  const props = defineProps({
-    columnHeaders: Array
-  })
+import { computed, toRaw } from 'vue';
+
+const props = defineProps({
+  columnHeaders: Array,
+  boardState: Array
+})
+
+const headerCrossedState = computed(() => {
+  let crossedState = props.columnHeaders.map(column => column.map(item => false))
+  for (var c = 0; c < crossedState.length; c++) {
+    let currentCount = 0
+    let currentItemIndex = 0
+    // Cross out items from the top of the column
+    for (var r = 0; r < props.boardState.length; r++) {
+      if (props.boardState[r][c] == 1) {
+        currentCount++
+        if (currentCount == props.columnHeaders[c][currentItemIndex]) {
+          crossedState[c][currentItemIndex] = true
+          currentItemIndex++
+          currentCount = 0
+        }
+      } else if (props.boardState[r][c] == 2) {
+        currentCount = 0
+      } else {
+        break
+      }
+    }
+    // Cross out items from the bottom of the column
+    currentCount = 0
+    currentItemIndex = props.columnHeaders[c].length - 1
+    for (var r = props.boardState.length - 1; r >= 0; r--) {
+      if (props.boardState[r][c] == 1) {
+        currentCount++
+        if (currentCount == props.columnHeaders[c][currentItemIndex]) {
+          crossedState[c][currentItemIndex] = true
+          currentItemIndex--
+          currentCount = 0
+        }
+      } else if (props.boardState[r][c] == 2) {
+        currentCount = 0
+      } else {
+        break
+      }
+    }
+  }
+  return crossedState
+})
+
 </script>
 
 <template>
   <div class="column-headers">
-    <div class="header" v-for="header in columnHeaders.headers">
+    <div class="header" v-for="(header, headerIndex) in columnHeaders">
       <div
         class="item"
-        :class="{ 'crossed': false }"
-        v-for="(item, index) in header">{{ item }}</div>
+        v-for="(item, itemIndex) in header"
+        :class="{ 'crossed': headerCrossedState[headerIndex][itemIndex] }">
+        {{ item }}
+      </div>
     </div>
   </div>
 </template>
