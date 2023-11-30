@@ -93,11 +93,11 @@ function dashButtonClicked() {
         </div>
         <div class="item">
           <h3 class="value">{{ cellsFilledText }}</h3>
-          <p class="name">cells filled</p>
+          <p class="name">squares filled</p>
         </div>
         <div class="item">
           <h3 class="value">{{ cellsCrossedText }}</h3>
-          <p class="name">cells crossed</p>
+          <p class="name">squares crossed</p>
         </div>
       </div>
     </div>
