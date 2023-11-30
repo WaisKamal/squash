@@ -303,20 +303,24 @@ function cellReleased(affirmed) {
           game.verdict = `You ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
           game.opponentId = ""
           game.status = "gameover"
-          gameChannel.trigger("client-opponent-lost", {
-            verdict: `Your opponent ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
-          })
-          pusher.unsubscribe(gameChannel.name)
+          if (game.gameMode == "1v1-new" || game.gameMode == "1v1-join") {
+            gameChannel.trigger("client-opponent-lost", {
+              verdict: `Your opponent ${game.boardData[row][column] ? "crossed" : "filled"} the wrong square`
+            })
+            pusher.unsubscribe(gameChannel.name)
+          }
         }
       } else if (game.boardState.cellsAffirmed == game.filledCellsCount) {
         game.isVictorious = true
         game.verdict = `You filled all squares!`
         game.opponentId = ""
         game.status = "gameover"
-        gameChannel.trigger("client-opponent-won", {
-          verdict: "Your opponent filled all squares"
-        })
-        pusher.unsubscribe(gameChannel.name)
+        if (game.gameMode == "1v1-new" || game.gameMode == "1v1-join") {
+          gameChannel.trigger("client-opponent-won", {
+            verdict: "Your opponent filled all squares"
+          })
+          pusher.unsubscribe(gameChannel.name)
+        }
       }
       // Finally modify boardState.styleData
       setTimeout(() => {

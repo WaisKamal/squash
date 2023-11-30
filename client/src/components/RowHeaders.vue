@@ -85,8 +85,8 @@ const headerCrossedState = computed(() => {
   content: "";
   position: absolute;
   top: 5px;
-  left: 8px;
-  width: 4px;
+  left: 9px;
+  width: 2px;
   height: 20px;
   border-radius: 2px;
   transition: 0.2s;
